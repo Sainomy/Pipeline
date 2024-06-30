@@ -1,48 +1,131 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-
-enum comando{add=0,sub=2,or=4,and=5};
-
-typedef struct {
+struct instrucao{
     char instrucao[17];
-    int opcode;
     int funct;
-    int rs;
-    int rt;
-    int rd;
-    int addr;
-    int imm;
-} Memoria;
+    int opcode;
+    int b11_9;
+    int b8_6;
+    int b5_3;
+    int b5_0;
+    int b0_6;
+};
 
-typedef struct{
-    int memoria_dados[256];
-}dados;
+struct controle{
+  //int louD;
+  int EscMem;
+  //int IREsc;
+  int RegDst;
+  int EscReg;
+  int MemParaReg;
+  int ULAFonte;
+  //int ULAFonteDown;
+  int ULAOp;
+  //int branch;
+  //int PCEsc;
+  //int FontePC;
+  int DVI;
+  int DVC;
+  };
 
-typedef struct{
-  dados memoria_dados;
-  int registradores[8];
+struct regiBI_ID{
+
   int pc;
-}back;
+  struct instrucao *inst;
+  struct variaveis *var;
 
-void fback(dados *memoria2 , int *registrador, back *reserva,int chose, int *count);
-void inicializarMemoriaDados(dados *memoria2);
-void iniciarReg(int *registrador);
+};
+
+struct regiDI_EX{
+
+  int A;
+  int B;
+  int pc;
+  struct instrucao *inst;
+  struct controle *sinais;
+  struct variaveis *var;
+
+};
+
+struct regiEX_MEM{
+
+  int pc;
+  struct instrucao *inst;
+  int saidaULA;
+  int B;
+  int muxRegDst;
+  struct controle *sinais;
+  struct variaveis *var;
+
+};
+
+struct regiMEM_ER{
+
+  int pc;
+  int muxRegDst;
+  int saidaULA;
+  int saidaMem;
+  struct instrucao *inst;
+  struct controle *sinais;
+  struct variaveis *var;
+
+};
+
+struct regiS{
+
+  struct regiBI_ID *bi_di;
+  struct regiDI_EX *di_ex;
+  struct regiEX_MEM *ex_mem;
+  struct regiMEM_ER *mem_er;
+ struct variaveis *var;
+
+};
+
+struct variaveis{
+
+    int *flag;
+    int muxDVC;
+    int muxDVI;
+    int muxloaD;
+    int muxRegDst;
+    int muxMemReg;
+    int muxULA;
+    int *saida1;
+    int *saida2;
+    int *ULA;
+    int *saidaMem; 
+
+};
+
+//funcoes principais
+
+struct instrucao memReg(struct instrucao *mem, int pc);
+int memDados(int *memD, int endereco, int dado, int EscMem, int *saida);
+
+void ula(int valor1, int valor2, int *saida, int *flag, int ULAop);
+
+void BancoRegistradores(int *registradores, int ReadEnd1, int ReadEnd2, int WriteEnd, int dado, int *saida1, int *saida2, int EscReg);
+
+struct controle *UC(struct controle *sinais, struct regiBI_ID *bits);
+
+//funcoes de apoio
+
+void carregarMemoria(char *nomeArquivo, struct instrucao *mem);
+
+int bi_dec(char *bin);
+
+void decodificarOpcode(struct instrucao *mem, int n_instrucoes); 
+
+struct controle * iniciarConrole();
+
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var);
+
+int * iniciarRegi();
+int * iniciarMemD();
+struct regiS * iniciarRegiS();
+struct variaveis * inciarVariaveis();
+struct regiS * copy(struct regiS *regS2);
+void verEstado(struct regiS  *regis);
 void verReg(int *registrador);
-void UC(Memoria *mem, int *count, int *registrador, dados *m2, back *reserva);
-void tipo_R(Memoria *mem, int *count);
-void tipo_I(Memoria *mem, int *count);
-void tipo_J(Memoria *mem, int *count);
-void dec_bi(char *output, int k, int *count);
-int bi_dec(char *mem);
-int converter_imm(char *imm);
-void inverter_bits(char *imm);
-void carregarMemoria(char *nomeArquivo, Memoria *mem, int *count, int *n_instrucoes);
-void decodificarOpcode(Memoria *mem, int *count);
-void DadosRegistrador(int *registradores, int dados, int end, int *output, int chose);
-void verinstrucoes(Memoria *mem, int *count, int chose, int *n_instrucoes);
-void vermemoriadados(dados *memoria2);
-void salvarAsm(Memoria *mem, int *n_instrucoes);
-void salvarDados(dados *memoria2);
-void carregarDados(dados *memoria2);
+void vermemoria(int *mem);
+void verRegT(struct regiS  *regiST);
+void verVariaveis(struct variaveis *var);
+void verSinais(struct controle *sinais);

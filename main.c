@@ -1,112 +1,134 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <math.h>
 #include "mips.h"
+//#include <ncurses.h>
 
 int main(){
-  back *reserva=malloc(sizeof(back));
-  int *n_instrucoes = (int *)malloc(sizeof(int));
-  dados *memoria2=malloc(sizeof(dados));
-  Memoria mem[256];
-  int *count = malloc(sizeof(int));
-  int *registrador=malloc(8*sizeof(int));
-  iniciarReg(registrador);
-  *count = 0;
-  *n_instrucoes = 0;
-  inicializarMemoriaDados(memoria2);
-  char *nome=malloc(sizeof(char)*51);
-  printf("Qual o nome do arquivo de instruções? ");
-  fgets(nome, 51, stdin);
-  if (nome[strlen(nome)-1] == '\n'){
-    nome[strlen(nome)-1] = '\0';
-  }
-  carregarMemoria(nome, mem, count, n_instrucoes);
-  char p;
+  int *pc = (int *)malloc(sizeof(int));
+  *pc = 0;
+  
+  struct instrucao *regmem = (struct instrucao*)malloc(256*sizeof(struct instrucao));
+  
+  int *registradores = iniciarRegi();
+  
+  int *memD = iniciarMemD();
+
+  struct controle *sinais = iniciarConrole();
+
+  struct regiS *regS1 = iniciarRegiS();
+  struct regiS *regS2 = iniciarRegiS();
+  
+  struct variaveis *var = inciarVariaveis();
+  
+  int op = 0;
+  
+  //////////
+  carregarMemoria("t.txt", regmem);
   do{
+    if(op!=1){ 
+        op=menu(sinais, pc, regS1, registradores, memD, var);
+        if(op == 3){
+          break;
+        }
+    }
 
+  //////
+ 
+  *pc = var->muxDVI;
 
-  printf("\n================================================================\n");
-  printf("\t\t\t    PIPELINE\n");
-  printf("================================================================\n");
-//  printf("\t    PC: %i Instrução: %s Estado: %i\n\n", *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual);
-//  printf("\t    Instrução em Assembly: ");
-//  if(mem->d_i==1){
-//    traduzirInstrucao(mem, PC);
-//  }
-  printf("\n");
-  printf("\t\t (r) (RUN) Executar todo o arquivo    \n");
-  printf("\t\t (e) (STEP) Executar uma linha        \n");
-  printf("\t\t (b) (BACK) Voltar uma instrução      \n");
-  printf("\t\t (v) Ver Registradores               \n");
-  printf("\t\t (a) Ver Instrução Atual             \n");
-  printf("\t\t (i) Ver Todas as Instruções         \n");
-  printf("\t\t (d) Ver Memória de Dados            \n");
-  printf("\t\t (s) Salvar .asm                     \n");
-  printf("\t\t (t) Salvar .dat                     \n");
-//  printf("\t\t (c) Carregar .dat                   \n");
-  printf("\t\t (x) Sair                            \n");
-  printf("================================================================\n");
-  printf("\t\tSelecione: ");
-  scanf("%s",&p);
+  *regS2->bi_di->inst =   memReg(regmem, *pc);;
+  regS2->bi_di->pc = *pc +1;
+  
+  //////////BI/DI
+  
+  UC(sinais, regS1->bi_di);
 
-  switch(p){
-    case 'r':
-      //return 1;
-      break;
-    case 'e':
-    //  return 0;
-      break;
-    case 'b':
-  //  if (!isEmpty(pilha)) {
-    //  fback(sinais, mem, PC, regitemp, registrador, pilha, 1);
-  //  }
-  //  else {
-  //    printf("Nenhuma instrução para voltar\n");
-  //  }
-  //    return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
-    case 'v':
-    //  verReg(registrador);struct nodo_Pilha * criaNodo(){
-  //  verReg(registrador, regitemp, sinais);
+  BancoRegistradores(registradores, regS1->bi_di->inst->b11_9, regS1->bi_di->inst->b8_6, regS1->mem_er->muxRegDst,  var->muxMemReg, var->saida1, var->saida2, regS1->mem_er->sinais->EscReg);
+  
+  *regS2->di_ex->inst = *regS1->bi_di->inst;
+  *regS2->di_ex->sinais = *sinais;
+  regS2->di_ex->pc = regS1->bi_di->pc;
+  
+  //////////DI/EX 
 
-  //    return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
-    case 'a':
-  //  verInstrucaoAtual(mem, *PC);
-    //  verinstrucoes(mem,count,0, n_instrucoes);
-  //    return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
-    case 'i':
-  //  verInstrucoesTodas(mem, *PC);
-      //verinstrucoes(mem, count,1, n_instrucoes);
-    //  return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
-    case 'd':
-    //  vermemoriadados(mem, PC);
-    //  return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
-    case 's':
-    //  salvarAsm(mem);
-    //  return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
-    case 't':
-    //  salvarDados(mem);
-    //  return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
-    case 'c':
-    //  carregarDados(memoria2);
-    //  return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
-    case 'x':
-      printf("Programa finalizado\n");
-    //  return 3;
-      break;
-    default:
-      printf("Opção inválida\n");
-    //  return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
+  
+  if(regS1->di_ex->sinais->RegDst == 0){
+    var->muxRegDst = regS1->di_ex->inst->b8_6;
   }
-  //return 3;
-}while(p!='x');
+  else{
+    var->muxRegDst = regS1->di_ex->inst->b5_3;
+  }
+
+  if(regS1->di_ex->sinais->ULAFonte == 1){
+    var->muxULA = regS1->di_ex->inst->b5_0;
+  }
+  else{
+    var->muxULA = *var->saida2;
+  }
+
+  ula(*var->saida1, var->muxULA, var->ULA , var->flag, regS1->di_ex->sinais->ULAOp);
+  
+  *regS2->ex_mem->sinais = *regS1->di_ex->sinais;
+  *regS2->ex_mem->inst = *regS1->di_ex->inst;
+  regS2->ex_mem->pc = regS1->di_ex->pc;
+  regS2->ex_mem->saidaULA = *var->ULA;
+  regS2->ex_mem->muxRegDst = var->muxRegDst;
+  
+  //////////EX/MEM
+  
+  memDados(memD, *var->ULA, *var->saida2, regS1->ex_mem->sinais->EscMem, var->saidaMem);
+
+  if((*var->flag + regS1->ex_mem->sinais->DVC) == 2){
+    var->muxDVC = 1;
+  }
+  if(var->muxDVC == 1){
+    var->muxDVC = *pc + 1 + regS1->ex_mem->inst->b5_0;
+  }
+  else{
+    var->muxDVC = *pc + 1;
+  }
+
+  if(regS1->ex_mem->sinais->DVI == 0){
+    var->muxDVI = var->muxDVC;
+  }
+  else{
+    var->muxDVI = /* complemeta com pc + 1 */ regS1->ex_mem->inst->b0_6;
+  }
+  
+  *regS2->mem_er->inst = *regS1->ex_mem->inst;
+  *regS2->mem_er->sinais = *regS1->ex_mem->sinais;
+  regS2->mem_er->pc = regS1->ex_mem->pc;
+  regS2->mem_er->saidaULA = regS1->ex_mem->saidaULA;
+  regS2->mem_er->muxRegDst = regS1->ex_mem->muxRegDst; 
+  
+  //////////MEM/ER
+
+  if(regS1->mem_er->sinais->MemParaReg == 1){
+    var->muxMemReg = regS1->mem_er->saidaULA;
+  }
+  else{
+    var->muxMemReg = *var->saidaMem;
+  }
+  
+  BancoRegistradores(registradores, 0, 0, regS1->mem_er->muxRegDst,  var->muxMemReg, NULL, NULL, regS1->mem_er->sinais->EscReg);
+  
+  ////////////////
+  
+  regS1 = copy(regS2);
+
+	printf("\n\nDados ao fim do ciclo");
+	printf("\n\nRegistradores Temporários\n");
+	verRegT(regS1);
+	printf("\n\nVariáveis\n");
+	verVariaveis(var);
+	printf("\n\nSinais\n");
+	verSinais(sinais);
+	printf("\n\nBanco de Registradores\n");
+	verReg(registradores);
+
+  //////////
+    
+  }while(1);
+
+return 0;
 }

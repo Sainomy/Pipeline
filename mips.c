@@ -64,19 +64,19 @@ void ula(int valor1, int valor2, int *saida, int *flag, int ULAop){
 }
 
 void BancoRegistradores(int *registradores, int ReadEnd1, int ReadEnd2, int WriteEnd, int dado, int *saida1, int *saida2, int EscReg){
-  if(EscReg == 1){
-     registradores[WriteEnd] = dado;
-  }
   if(saida1 != NULL && saida2 != NULL){
     *saida1 = registradores[ReadEnd1];
     *saida2 = registradores[ReadEnd2];
+  }
+  if(EscReg == 1){
+     registradores[WriteEnd] = dado;
   }
 }
 
 struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
   switch(bits->inst->opcode){
-    case 0 || 1:
-      sinais->RegDst = 0;
+    case 0:
+      sinais->RegDst = 1;
       sinais->ULAOp = bits->inst->funct;
       sinais->ULAFonte = 0;
       sinais->DVC = 0;
@@ -85,6 +85,18 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
       sinais->EscReg = 1;
       sinais->MemParaReg = 1;
       break;
+    
+     case 1:
+      sinais->RegDst = 1;
+      sinais->ULAOp = bits->inst->funct;
+      sinais->ULAFonte = 0;
+      sinais->DVC = 0;
+      sinais->DVI = 0;
+      sinais->EscMem = 0;
+      sinais->EscReg = 1;
+      sinais->MemParaReg = 1;
+      break;
+    
     
     case 2:
       sinais->RegDst = 0;

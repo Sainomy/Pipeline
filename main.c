@@ -39,6 +39,7 @@ int main(){
   *regS2->bi_di->inst =   memReg(regmem, *pc);;
   regS2->bi_di->pc = *pc +1;
   
+  
   //////////BI/DI
   
   UC(sinais, regS1->bi_di);
@@ -48,9 +49,11 @@ int main(){
   *regS2->di_ex->inst = *regS1->bi_di->inst;
   *regS2->di_ex->sinais = *sinais;
   regS2->di_ex->pc = regS1->bi_di->pc;
+  regS2->di_ex->A = *var->saida1;
+  regS2->di_ex->B = *var->saida2;
+  
   
   //////////DI/EX 
-
   
   if(regS1->di_ex->sinais->RegDst == 0){
     var->muxRegDst = regS1->di_ex->inst->b8_6;
@@ -63,20 +66,20 @@ int main(){
     var->muxULA = regS1->di_ex->inst->b5_0;
   }
   else{
-    var->muxULA = *var->saida2;
+    var->muxULA = regS1->di_ex->B;
   }
 
-  ula(*var->saida1, var->muxULA, var->ULA , var->flag, regS1->di_ex->sinais->ULAOp);
+  ula(regS1->di_ex->A, var->muxULA, var->ULA , var->flag, regS1->di_ex->sinais->ULAOp);
   
   *regS2->ex_mem->sinais = *regS1->di_ex->sinais;
   *regS2->ex_mem->inst = *regS1->di_ex->inst;
   regS2->ex_mem->pc = regS1->di_ex->pc;
   regS2->ex_mem->saidaULA = *var->ULA;
   regS2->ex_mem->muxRegDst = var->muxRegDst;
-  
+  regS2->ex_mem->B =  regS1->di_ex->B;
   //////////EX/MEM
   
-  memDados(memD, *var->ULA, *var->saida2, regS1->ex_mem->sinais->EscMem, var->saidaMem);
+  memDados(memD, *var->ULA,  regS1->ex_mem->B , regS1->ex_mem->sinais->EscMem, var->saidaMem);
 
   if((*var->flag + regS1->ex_mem->sinais->DVC) == 2){
     var->muxDVC = 1;

@@ -52,6 +52,7 @@ struct regiEX_MEM{
   int saidaULA;
   int B;
   int muxRegDst;
+  int flag;
   struct controle *sinais;
   struct variaveis *var;
 
@@ -98,7 +99,7 @@ struct variaveis{
 //funcoes principais
 
 struct instrucao memReg(struct instrucao *mem, int pc);
-int memDados(int *memD, int endereco, int dado, int EscMem, int *saida);
+void memDados(int *memD, int endereco, int dado, int EscMem, int *saida);
 
 void ula(int valor1, int valor2, int *saida, int *flag, int ULAop);
 

@@ -11,13 +11,12 @@ struct instrucao memReg(struct instrucao *mem, int pc){
   return mem[pc];
 }
 
-int memDados(int *memD, int endereco, int dado, int EscMem, int *saida){
+void memDados(int *memD, int endereco, int dado, int EscMem, int *saida){
  if(EscMem == 0){
-   return memD[endereco]; 
+   *saida = memD[endereco]; 
  } 
   else{
    memD[endereco] = dado;
-   return *memD;
   }
 }
 
@@ -53,7 +52,7 @@ void ula(int valor1, int valor2, int *saida, int *flag, int ULAop){
 	  *saida = valor1 | valor2;
 	  break;
 
-	  case 6:
+	  case 1:
 	  if(valor1 == valor2){
 		*flag = 1;
 		*saida = 0;
@@ -442,6 +441,7 @@ struct regiS * copy(struct regiS *regS2){
 	*aux->ex_mem->sinais = *regS2->ex_mem->sinais;
 	*aux->ex_mem->var = *regS2->ex_mem->var;
 	aux->ex_mem->pc = regS2->ex_mem->pc;
+	aux->ex_mem->flag = regS2->ex_mem->flag;
 	
 	aux->mem_er->pc = regS2->mem_er->pc;
 	aux->mem_er->muxRegDst = regS2->mem_er->muxRegDst;

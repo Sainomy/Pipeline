@@ -76,12 +76,13 @@ int main(){
   regS2->ex_mem->pc = regS1->di_ex->pc;
   regS2->ex_mem->saidaULA = *var->ULA;
   regS2->ex_mem->muxRegDst = var->muxRegDst;
-  regS2->ex_mem->B =  regS1->di_ex->B;
+  regS2->ex_mem->B = regS1->di_ex->B;
+  regS2->ex_mem->flag = *var->flag;
   //////////EX/MEM
   
-  memDados(memD, *var->ULA,  regS1->ex_mem->B , regS1->ex_mem->sinais->EscMem, var->saidaMem);
+  memDados(memD, regS1->ex_mem->saidaULA,  regS1->ex_mem->B , regS1->ex_mem->sinais->EscMem, var->saidaMem);
 
-  if((*var->flag + regS1->ex_mem->sinais->DVC) == 2){
+  if((regS1->ex_mem->flag + regS1->ex_mem->sinais->DVC) == 2){
     var->muxDVC = 1;
   }
   if(var->muxDVC == 1){
@@ -103,6 +104,7 @@ int main(){
   regS2->mem_er->pc = regS1->ex_mem->pc;
   regS2->mem_er->saidaULA = regS1->ex_mem->saidaULA;
   regS2->mem_er->muxRegDst = regS1->ex_mem->muxRegDst; 
+  regS2->mem_er->saidaMem = *var->saidaMem;
   
   //////////MEM/ER
 
@@ -110,7 +112,7 @@ int main(){
     var->muxMemReg = regS1->mem_er->saidaULA;
   }
   else{
-    var->muxMemReg = *var->saidaMem;
+    var->muxMemReg = regS1->mem_er->saidaMem;
   }
   
   BancoRegistradores(registradores, 0, 0, regS1->mem_er->muxRegDst,  var->muxMemReg, NULL, NULL, regS1->mem_er->sinais->EscReg);

@@ -489,3 +489,94 @@ void verVariaveis(struct variaveis *var){
 void verSinais(struct controle *sinais){
 	printf("\nmuxEscMem: %i, \nRegDst: %i, \nEscReg: %i, \nMemParaReg: %i, \nULAFonte: %i, \nULAOp: %i, \nDVI: %i, \nDVC: %i",sinais->EscMem, sinais->RegDst, sinais->EscReg, sinais->MemParaReg, sinais->ULAFonte, sinais->ULAOp, sinais->DVI, sinais->DVC);
 };
+
+
+back * printn(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp){
+  back *aux=(back *)malloc(sizeof(back));
+/*
+  aux->sinais.louD = sinais->louD;
+  aux->sinais.EscMem = sinais->EscMem;
+  aux->sinais.IREsc = sinais->IREsc;
+  aux->sinais.RegDst = sinais->RegDst;
+  aux->sinais.EscReg = sinais->EscReg;
+  aux->sinais.MemParaReg = sinais->MemParaReg;
+  aux->sinais.ULAFonteUP = sinais->ULAFonteUP;
+  aux->sinais.ULAFonteDown = sinais->ULAFonteDown;
+  aux->sinais.controleULA = sinais->controleULA;
+  aux->sinais.branch = sinais->branch;
+  aux->sinais.PCEsc = sinais->PCEsc;
+  aux->sinais.FontePC = sinais->FontePC;
+  aux->sinais.prox_estado = sinais->prox_estado;
+  aux->sinais.estado_atual = sinais->estado_atual;
+
+  aux->regiapoio.A = regitemp->A;
+  aux->regiapoio.B = regitemp->B;
+  aux->regiapoio.saidaULA = regitemp->saidaULA;
+  aux->regiapoio.dadosmem = regitemp->dadosmem;
+  aux->regiapoio.instrucao = regitemp->instrucao;
+
+  for(int i = 0; i<256; i++){
+    aux->memoria[i] = mem[i];
+  }
+
+  for(int i = 0; i<8; i++){
+    aux->registradores[i] = registrador[i];
+  }
+
+  aux->pc = *pc;
+	*/
+  return aux;
+}
+
+
+void push(Pilha* stack, back *estado) {
+  Nodo* novonodo = (Nodo*)malloc(sizeof(Nodo));
+  novonodo->estado = estado;
+  novonodo->next = stack->top;
+  stack->top = novonodo;
+  stack->tam++;
+}
+
+void pop(Pilha *pilha) {
+  if (pilha->tam == 0 ) {
+      printf("Pilha vazia\n");
+      exit(1);
+  }
+  Nodo *temp = pilha->top;
+  pilha->top = pilha->top->next;
+  free(temp);
+  pilha->tam--;
+}
+
+Nodo * criaNodo(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp){
+
+    Nodo *aux=(Nodo *)malloc(sizeof(Nodo));
+    aux->estado = printn(registradores, memD, inst, pc, sinais, var, regTemp);
+
+    return aux;
+}
+
+
+void fback(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp, Pilha *pilha, int chose){
+
+  if(chose == 0 ){
+    Nodo *aux;
+    aux=criaNodo(registradores, memD, inst, pc, sinais, var, regTemp);
+    push(pilha, aux->estado);
+    free(aux);
+  }
+  else{/*
+    sinais = pilha->top->estado->sinais;
+    for(int i = 0; i<256; i++){
+      mem[i] = pilha->top->estado->memoria[i];
+    }
+    regitemp = pilha->top->estado->regiapoio;
+    for(int i = 0; i<8; i++){
+      registrador[i] = pilha->top->estado->registradores[i];
+    }*/
+    pc = pilha->top->estado->pc;
+    pop(pilha);
+    }
+}
+
+

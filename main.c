@@ -128,6 +128,7 @@ int main(){
 	verVariaveis(var);
 	printf("\n\nSinais\n");
 	verSinais(sinais);
+	printf("\n\nPC %i\n", *pc);
 	printf("\n\nBanco de Registradores\n");
 	verReg(registradores);
 

@@ -283,7 +283,7 @@ char menuview(WINDOW *menuwin) {
    // mvwprintw(menuwin, 17, 2, "\t(t) Salvar .dat");
     mvwprintw(menuwin, 20, 2, "\t(x) Sair");
     mvwprintw(menuwin, 21, 2, "****************************************************************");
-    mvwprintw(menuwin, 22, 2, "\tSelecione: p: %s", p);
+    mvwprintw(menuwin, 22, 2, "\tSelecione: p: ");
 
     wrefresh(menuwin);
     char p = wgetch(menuwin);  // Captura a entrada do usuário
@@ -396,6 +396,40 @@ int * iniciarRegi(){
   return aux;
 
 };
+// Função para exibir a janela dos registradores
+void exibir_registradores(WINDOW *regwin, int *registrador) {
+    box(regwin, 0, 0);
+    mvwprintw(regwin, 1, 1, "Banco de Registradores");
+    
+    for (int i = 0; i < 8; i++) {
+        mvwprintw(regwin, 2 + i, 1, "Registrador %d: %d", i, registrador[i]);
+    }
+
+    wrefresh(regwin);
+}
+
+// Função para exibir a janela da memória
+void exibir_memoria(WINDOW *memwin, int *mem) {
+    box(memwin, 0, 0);
+    mvwprintw(memwin, 1, 1, "Memória");
+    
+    for(int i=0;i<256;i++){
+		mvwprintw(memwin, 2 + i, 1,"\n[%i]: %i \n",i, mem[i]);
+	  }	
+
+    wrefresh(memwin);
+}
+void exibir_regt(WINDOW *regtwin, struct regiS  *regisT) {
+    box(regtwin, 0, 0);
+    mvwprintw(regtwin, 1, 1, "Memória de Instruções");
+
+	  mvwprintw(regtwin, 2 , 1,"\n\nBI_DI \nInstrução: [%s]\nPC: %i", regisT->bi_di->inst->instrucao, regisT->bi_di->pc);
+	  mvwprintw(regtwin, 3 , 1,"\n\nDI EX \nInstrução: [%s]\nPC: %i\nA: %i\nB: %i", regisT->di_ex->inst->instrucao, regisT->di_ex->pc, regisT->di_ex->A, regisT->di_ex->B);
+	  mvwprintw(regtwin, 4 , 1,"\n\nEX_MEM\nInstrução: [%s]\nPC: %i\nSa´da ULA: %i\nB: %i\nRegistrador destino: %i", regisT->ex_mem->inst->instrucao, regisT->ex_mem->pc, regisT->ex_mem->saidaULA, regisT->ex_mem->B, regisT->ex_mem->muxRegDst);
+	  mvwprintw(regtwin, 5 , 1,"\n\nMEM_ER\nInstrução: [%s]\nPC: %i\nRegistrador destino: %i", regisT->mem_er->inst->instrucao, regisT->mem_er->pc, regisT->mem_er->muxRegDst);
+  
+    wrefresh(regtwin);
+}
 
 int * iniciarMemD(){
 

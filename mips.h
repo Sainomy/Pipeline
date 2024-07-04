@@ -141,6 +141,10 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes);
 struct controle * iniciarConrole();
 
 char menuview(WINDOW *menuwin);
+void exibir_registradores(WINDOW *regwin, int *registrador);
+void exibir_memoria(WINDOW *memwin, int *mem);
+void exibir_regt(WINDOW *regtwin, struct regiS  *regisT);
+
 int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, char p);
 
 int * iniciarRegi();

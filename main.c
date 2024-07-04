@@ -48,29 +48,23 @@ int main(){
   
   //////////
   carregarMemoria("instrucoes.txt", regmem);
-  do{
-     wrefresh(startwin);
+   wrefresh(startwin);
         int ch = wgetch(startwin);
         if (ch == '\n') {  // Verifica se o usuário pressionou Enter
-            delwin(startwin); // Deleta a janela inicial
+            delwin(startwin); 
              WINDOW *menuwin = newwin(22, 62, (height / 2) - 11, (width / 2) - 31);
+             WINDOW *regwin = newwin(10, 30, 1, 1);
+             WINDOW *regtwin = newwin(10, 30, 12, 1);
+             WINDOW *memwin = newwin(10, 120, 42, 30);
+  do{
+    // Deleta a janela inicial
+            //cria as janelas
+              exibir_registradores(regwin, registradores);
+              exibir_memoria(memwin, memD);
+              //exibir_regt(regtwin, regis); //como que chama os registradores temporarios aqui?
               char p = menuview(menuwin);
+             
     if(op!=1){ 
-      
-
-            // Criar janelas fixas para o menu, registradores e memória
-           
-          //  WINDOW *regwin = newwin(10, 30, 1, 1);
-          //  WINDOW *memwin = newwin(10, 30, 12, 1);
-          //  WINDOW *instmem = newwin(10, 120, 44, 30);
-
-                //exibir_registradores(regwin);
-              //  exibir_memoria(memwin);
-               // exibir_inst(instmem);
-               
-               // if (p == 'x') {
-                    //break;  // Encerra o programa ao pressionar 'x'
-              //  }
 
               op=menu(sinais, pc, regS1, registradores, memD, var, pilha, p);
                   if(op == 3){
@@ -86,7 +80,7 @@ int main(){
            // delwin(instmem);
         }
      
-    }
+    
     
    
   //////
@@ -185,9 +179,10 @@ int main(){
 
   fback(registradores, memD, regS1->bi_di->inst,  pc, sinais, var, regS1,  pilha, 0);
   //////////
-    endwin(); 
+   
         
   }while(1);
-
+ endwin(); 
 return 0;
+}
 }

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include "mips.h"
+#include <ncurses.h>
 
 
 //funcoes principais
@@ -11,12 +12,13 @@ struct instrucao memReg(struct instrucao *mem, int pc){
   return mem[pc];
 }
 
-void memDados(int *memD, int endereco, int dado, int EscMem, int *saida){
+int memDados(int *memD, int endereco, int dado, int EscMem, int *saida){
  if(EscMem == 0){
-   *saida = memD[endereco]; 
+   return memD[endereco]; 
  } 
   else{
    memD[endereco] = dado;
+   return *memD;
   }
 }
 
@@ -52,7 +54,7 @@ void ula(int valor1, int valor2, int *saida, int *flag, int ULAop){
 	  *saida = valor1 | valor2;
 	  break;
 
-	  case 1:
+	  case 6:
 	  if(valor1 == valor2){
 		*flag = 1;
 		*saida = 0;
@@ -254,20 +256,53 @@ struct controle * iniciarConrole(){
   //aux->FontePC=0;
   return aux;
 }
+char menuview(WINDOW *menuwin) {
+    box(menuwin, 0, 0);
+    keypad(menuwin, TRUE); // Habilita captura de teclas especiais
+    wrefresh(menuwin);
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var){
+    // Desenhando o cabeçalho
+    mvwprintw(menuwin, 1, 2, "                                         ----                   ");
+    mvwprintw(menuwin, 2, 2, "                          PIPELINE      |( )|                   ");
+    mvwprintw(menuwin, 3, 2, "                                        ----                    ");
 
-  char p;
+   // mvwprintw(menuwin, 5, 2, "\tPC: %i Instrução: %s Estado: %i", 0, "NOP", 0);  // Valores de exemplo
+    mvwprintw(menuwin, 7, 2, "\tInstrução em Assembly:");
+    mvwprintw(menuwin, 9, 2, "\t(r) (RUN) Executar todo o arquivo");
+    mvwprintw(menuwin, 10, 2, "\t(e) (STEP) Executar uma linha");
+    mvwprintw(menuwin, 11, 2, "\t(b) (BACK) Voltar uma instrução");
+    mvwprintw(menuwin, 12, 2, "\t(v) Ver Estado");
+    mvwprintw(menuwin, 13, 2, "\t(a) Ver Instrução Atual");
+    mvwprintw(menuwin, 14, 2, "\t(i) Ver Registradores");
+    mvwprintw(menuwin, 15, 2, "\t(d) Ver Memória de Dados");
+    mvwprintw(menuwin, 16, 2, "\t(i) Ver Todas as Instruções");
+    mvwprintw(menuwin, 17, 2, "\t(s) Ver Sinais");
+    mvwprintw(menuwin, 18, 2, "\t(t) Ver Variáveis");
+    mvwprintw(menuwin, 19, 2, "\t(c) Ver Registradores Temporários");
+    //mvwprintw(menuwin, 16, 2, "\t(s) Salvar .asm");
+   // mvwprintw(menuwin, 17, 2, "\t(t) Salvar .dat");
+    mvwprintw(menuwin, 20, 2, "\t(x) Sair");
+    mvwprintw(menuwin, 21, 2, "****************************************************************");
+    mvwprintw(menuwin, 22, 2, "\tSelecione: p: %s", p);
 
-  printf("\n\n================================================================\n");
+    wrefresh(menuwin);
+    char p = wgetch(menuwin);  // Captura a entrada do usuário
+    return p;
+}
+
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, char p){
+
+  //char p;
+
+  /*printf("\n\n================================================================\n");
   printf("\t\t\t    PIPELINE\n");
   printf("================================================================\n");
- /* printf("\t    PC: %i Instrução: %s Estado: %i\n\n", *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual);
+  printf("\t    PC: %i Instrução: %s Estado: %i\n\n", *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual);
   printf("\t    Instrução em Assembly: ");
   if(mem->d_i==1){
     traduzirInstrucao(mem, PC);
   }
-  */
+  
   printf("\n");
   printf("\t\t (r) (RUN) Executar todo o arquivo    \n");
   printf("\t\t (e) (STEP) Executar uma linha        \n");
@@ -282,7 +317,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
   printf("\t\t (x) Sair                            \n");
   printf("================================================================\n");
   printf("\t\tSelecione: ");
-  scanf("%s",&p);
+  scanf("%s",&p);*/
 
   switch(p){
     case 'r':
@@ -291,51 +326,52 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
     case 'e':
       return 0;
       break;
-    /*
     case 'b':
-    if (!isEmpty(pilha)) {
-      fback(sinais, mem, PC, regitemp, registrador, pilha, 1);
-    }
-    else {
-      printf("Nenhuma instrução para voltar\n");
-    }
-      return menu(sinais, mem, PC, regitemp, registrador, pilha);
+      if (!isEmpty(pilha)) {
+        fback(registrador, mem, regis->bi_di->inst,  PC, sinais, var, regis,  pilha, 1);
+      }
+      else {
+        printf("Nenhuma instrução para voltar\n");
+      }
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
-      */
+    /*
     case 'v':
 	  verEstado(regis);
       return menu(sinais, PC, regis, registrador, mem, var);
       break;
     
-    /*
     case 'a':
     verInstrucaoAtual(mem, *PC);
     //  verinstrucoes(mem,count,0, n_instrucoes);
       return menu(sinais, mem, PC, regitemp, registrador, pilha);
       break;
       */
-      
-      
     case 'i':
       verReg(registrador);
-      return menu(sinais, PC, regis, registrador, mem, var);
+       
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
     case 'd':
       vermemoria(mem);
-      return menu(sinais, PC, regis, registrador, mem, var);
+       
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
    
     case 'c':
       verRegT(regis);
-      return menu(sinais, PC, regis, registrador, mem, var);
+       
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
     case 't':
       verVariaveis(var);
-      return menu(sinais, PC, regis, registrador, mem, var);
+      
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
     case 's':
       verSinais(sinais);
-      return menu(sinais, PC, regis, registrador, mem, var);
+      
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
    
     case 'x':
@@ -344,7 +380,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       break;
     default:
       printf("Opção inválida\n");
-      return menu(sinais, PC, regis, registrador, mem, var);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
     
   }
@@ -441,7 +477,6 @@ struct regiS * copy(struct regiS *regS2){
 	*aux->ex_mem->sinais = *regS2->ex_mem->sinais;
 	*aux->ex_mem->var = *regS2->ex_mem->var;
 	aux->ex_mem->pc = regS2->ex_mem->pc;
-	aux->ex_mem->flag = regS2->ex_mem->flag;
 	
 	aux->mem_er->pc = regS2->mem_er->pc;
 	aux->mem_er->muxRegDst = regS2->mem_er->muxRegDst;
@@ -490,44 +525,17 @@ void verSinais(struct controle *sinais){
 	printf("\nmuxEscMem: %i, \nRegDst: %i, \nEscReg: %i, \nMemParaReg: %i, \nULAFonte: %i, \nULAOp: %i, \nDVI: %i, \nDVC: %i",sinais->EscMem, sinais->RegDst, sinais->EscReg, sinais->MemParaReg, sinais->ULAFonte, sinais->ULAOp, sinais->DVI, sinais->DVC);
 };
 
-
-back * printn(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp){
+back *printn(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis *var, struct regiS *regTemp){
   back *aux=(back *)malloc(sizeof(back));
-/*
-  aux->sinais.louD = sinais->louD;
-  aux->sinais.EscMem = sinais->EscMem;
-  aux->sinais.IREsc = sinais->IREsc;
-  aux->sinais.RegDst = sinais->RegDst;
-  aux->sinais.EscReg = sinais->EscReg;
-  aux->sinais.MemParaReg = sinais->MemParaReg;
-  aux->sinais.ULAFonteUP = sinais->ULAFonteUP;
-  aux->sinais.ULAFonteDown = sinais->ULAFonteDown;
-  aux->sinais.controleULA = sinais->controleULA;
-  aux->sinais.branch = sinais->branch;
-  aux->sinais.PCEsc = sinais->PCEsc;
-  aux->sinais.FontePC = sinais->FontePC;
-  aux->sinais.prox_estado = sinais->prox_estado;
-  aux->sinais.estado_atual = sinais->estado_atual;
-
-  aux->regiapoio.A = regitemp->A;
-  aux->regiapoio.B = regitemp->B;
-  aux->regiapoio.saidaULA = regitemp->saidaULA;
-  aux->regiapoio.dadosmem = regitemp->dadosmem;
-  aux->regiapoio.instrucao = regitemp->instrucao;
-
-  for(int i = 0; i<256; i++){
-    aux->memoria[i] = mem[i];
-  }
-
-  for(int i = 0; i<8; i++){
-    aux->registradores[i] = registrador[i];
-  }
-
-  aux->pc = *pc;
-	*/
+  aux->pc = pc;
+  aux->registradores = registradores;
+  aux->memD = memD;
+  aux->inst = inst;
+  aux->sinais = sinais;
+  aux->var = *var;
+  aux->regTemp = *regTemp;
   return aux;
 }
-
 
 void push(Pilha* stack, back *estado) {
   Nodo* novonodo = (Nodo*)malloc(sizeof(Nodo));
@@ -544,20 +552,21 @@ void pop(Pilha *pilha) {
   }
   Nodo *temp = pilha->top;
   pilha->top = pilha->top->next;
+  free(temp->estado);
   free(temp);
   pilha->tam--;
 }
 
-Nodo * criaNodo(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp){
+Nodo *criaNodo(int *registradores, int *memD, struct instrucao *inst, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp){
 
     Nodo *aux=(Nodo *)malloc(sizeof(Nodo));
-    aux->estado = printn(registradores, memD, inst, pc, sinais, var, regTemp);
+    aux->estado = printn(registradores, memD, inst, *pc, *sinais, var, regTemp);
 
     return aux;
 }
 
 
-void fback(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp, Pilha *pilha, int chose){
+void fback(int *registradores, int *memD, struct instrucao *inst, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose){
 
   if(chose == 0 ){
     Nodo *aux;
@@ -565,18 +574,12 @@ void fback(int *registradores, int *memD, struct instrucao *inst, int pc, struct
     push(pilha, aux->estado);
     free(aux);
   }
-  else{/*
-    sinais = pilha->top->estado->sinais;
-    for(int i = 0; i<256; i++){
-      mem[i] = pilha->top->estado->memoria[i];
-    }
-    regitemp = pilha->top->estado->regiapoio;
-    for(int i = 0; i<8; i++){
-      registrador[i] = pilha->top->estado->registradores[i];
-    }*/
-    pc = pilha->top->estado->pc;
+  else{
+    *pc = pilha->top->estado->pc;
     pop(pilha);
     }
 }
 
-
+int isEmpty(Pilha* pilha) {
+  return pilha->top == NULL;
+}

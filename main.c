@@ -1,14 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mips.h"
-//#include <ncurses.h>
+#include <ncurses.h>
 
 int main(){
+   initscr();            // Inicia o modo ncurses
+    cbreak();             // Desativa o buffering de linha
+    noecho();             // Desativa a exibição dos caracteres digitados
+    curs_set(FALSE);      // Oculta o cursor
+
+    int height, width;
+    getmaxyx(stdscr, height, width);
+
+    WINDOW *startwin = newwin(20, 50, (height / 2) - 10, (width / 2) - 25);
+    box(startwin, 0, 0);
+    keypad(startwin, TRUE); // Habilita captura de teclas especiais
+    refresh();
+    wrefresh(startwin);
+
+    mvwprintw(startwin, 3, 15, "PIPELINE");
+  	mvwprintw(startwin, 6, 20, "  ______");
+  	mvwprintw(startwin, 7, 20, " /     /|");
+  	mvwprintw(startwin, 8, 20, "/_____/ |");
+  	mvwprintw(startwin, 9, 20, "|_____| |");
+  	mvwprintw(startwin, 10, 20, "| (o) | |");
+  	mvwprintw(startwin, 11, 20, "|_____|/ ");
+  	mvwprintw(startwin, 15, 15, "[Pressione ENTER para Iniciar]");
+
+             // E
   int *pc = (int *)malloc(sizeof(int));
   *pc = 0;
   
   struct instrucao *regmem = (struct instrucao*)malloc(256*sizeof(struct instrucao));
-  
+  Pilha *pilha = (Pilha *)malloc(sizeof(Pilha));
   int *registradores = iniciarRegi();
   
   int *memD = iniciarMemD();
@@ -23,22 +47,54 @@ int main(){
   int op = 0;
   
   //////////
-  carregarMemoria("t.txt", regmem);
+  carregarMemoria("instrucoes.txt", regmem);
   do{
+     wrefresh(startwin);
+        int ch = wgetch(startwin);
+        if (ch == '\n') {  // Verifica se o usuário pressionou Enter
+            delwin(startwin); // Deleta a janela inicial
+             WINDOW *menuwin = newwin(22, 62, (height / 2) - 11, (width / 2) - 31);
+              char p = menuview(menuwin);
     if(op!=1){ 
-        op=menu(sinais, pc, regS1, registradores, memD, var);
-        if(op == 3){
-          break;
-        }
-    }
+      
 
+            // Criar janelas fixas para o menu, registradores e memória
+           
+          //  WINDOW *regwin = newwin(10, 30, 1, 1);
+          //  WINDOW *memwin = newwin(10, 30, 12, 1);
+          //  WINDOW *instmem = newwin(10, 120, 44, 30);
+
+                //exibir_registradores(regwin);
+              //  exibir_memoria(memwin);
+               // exibir_inst(instmem);
+               
+               // if (p == 'x') {
+                    //break;  // Encerra o programa ao pressionar 'x'
+              //  }
+
+              op=menu(sinais, pc, regS1, registradores, memD, var, pilha, p);
+                  if(op == 3){
+              break;
+              }
+
+            // Deleta as janelas antes de encerrar
+           
+            //delwin(menuwin);
+          
+           // delwin(regwin);
+           // delwin(memwin);
+           // delwin(instmem);
+        }
+     
+    }
+    
+   
   //////
  
   *pc = var->muxDVI;
 
   *regS2->bi_di->inst =   memReg(regmem, *pc);;
   regS2->bi_di->pc = *pc +1;
-  
   
   //////////BI/DI
   
@@ -49,11 +105,9 @@ int main(){
   *regS2->di_ex->inst = *regS1->bi_di->inst;
   *regS2->di_ex->sinais = *sinais;
   regS2->di_ex->pc = regS1->bi_di->pc;
-  regS2->di_ex->A = *var->saida1;
-  regS2->di_ex->B = *var->saida2;
-  
   
   //////////DI/EX 
+
   
   if(regS1->di_ex->sinais->RegDst == 0){
     var->muxRegDst = regS1->di_ex->inst->b8_6;
@@ -66,23 +120,22 @@ int main(){
     var->muxULA = regS1->di_ex->inst->b5_0;
   }
   else{
-    var->muxULA = regS1->di_ex->B;
+    var->muxULA = *var->saida2;
   }
 
-  ula(regS1->di_ex->A, var->muxULA, var->ULA , var->flag, regS1->di_ex->sinais->ULAOp);
+  ula(*var->saida1, var->muxULA, var->ULA , var->flag, regS1->di_ex->sinais->ULAOp);
   
   *regS2->ex_mem->sinais = *regS1->di_ex->sinais;
   *regS2->ex_mem->inst = *regS1->di_ex->inst;
   regS2->ex_mem->pc = regS1->di_ex->pc;
   regS2->ex_mem->saidaULA = *var->ULA;
   regS2->ex_mem->muxRegDst = var->muxRegDst;
-  regS2->ex_mem->B = regS1->di_ex->B;
-  regS2->ex_mem->flag = *var->flag;
+  
   //////////EX/MEM
   
-  memDados(memD, regS1->ex_mem->saidaULA,  regS1->ex_mem->B , regS1->ex_mem->sinais->EscMem, var->saidaMem);
+  memDados(memD, *var->ULA, *var->saida2, regS1->ex_mem->sinais->EscMem, var->saidaMem);
 
-  if((regS1->ex_mem->flag + regS1->ex_mem->sinais->DVC) == 2){
+  if((*var->flag + regS1->ex_mem->sinais->DVC) == 2){
     var->muxDVC = 1;
   }
   if(var->muxDVC == 1){
@@ -104,7 +157,6 @@ int main(){
   regS2->mem_er->pc = regS1->ex_mem->pc;
   regS2->mem_er->saidaULA = regS1->ex_mem->saidaULA;
   regS2->mem_er->muxRegDst = regS1->ex_mem->muxRegDst; 
-  regS2->mem_er->saidaMem = *var->saidaMem;
   
   //////////MEM/ER
 
@@ -112,7 +164,7 @@ int main(){
     var->muxMemReg = regS1->mem_er->saidaULA;
   }
   else{
-    var->muxMemReg = regS1->mem_er->saidaMem;
+    var->muxMemReg = *var->saidaMem;
   }
   
   BancoRegistradores(registradores, 0, 0, regS1->mem_er->muxRegDst,  var->muxMemReg, NULL, NULL, regS1->mem_er->sinais->EscReg);
@@ -128,12 +180,13 @@ int main(){
 	verVariaveis(var);
 	printf("\n\nSinais\n");
 	verSinais(sinais);
-	printf("\n\nPC %i\n", *pc);
 	printf("\n\nBanco de Registradores\n");
 	verReg(registradores);
 
+  fback(registradores, memD, regS1->bi_di->inst,  pc, sinais, var, regS1,  pilha, 0);
   //////////
-    
+    endwin(); 
+        
   }while(1);
 
 return 0;

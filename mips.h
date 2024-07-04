@@ -1,3 +1,5 @@
+#include <ncurses.h>
+
 struct instrucao{
     char instrucao[17];
     int funct;
@@ -52,7 +54,6 @@ struct regiEX_MEM{
   int saidaULA;
   int B;
   int muxRegDst;
-  int flag;
   struct controle *sinais;
   struct variaveis *var;
 
@@ -97,7 +98,7 @@ struct variaveis{
 };
 
 typedef struct{
-	
+
   int *registradores;
   int *memD;
   struct instrucao *inst;
@@ -121,7 +122,7 @@ typedef struct {
 //funcoes principais
 
 struct instrucao memReg(struct instrucao *mem, int pc);
-void memDados(int *memD, int endereco, int dado, int EscMem, int *saida);
+int memDados(int *memD, int endereco, int dado, int EscMem, int *saida);
 
 void ula(int valor1, int valor2, int *saida, int *flag, int ULAop);
 
@@ -139,7 +140,8 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes);
 
 struct controle * iniciarConrole();
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var);
+char menuview(WINDOW *menuwin);
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, char p);
 
 int * iniciarRegi();
 int * iniciarMemD();
@@ -152,10 +154,9 @@ void vermemoria(int *mem);
 void verRegT(struct regiS  *regiST);
 void verVariaveis(struct variaveis *var);
 void verSinais(struct controle *sinais);
-
 void push(Pilha* stack, back *estado);
 void pop(Pilha* pilha);
-Nodo * criaNodo(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp);
-back * printn(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp);
-void fback(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp, Pilha *pilha, int chose);
-back * printn(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis var, struct regiS regTemp);
+Nodo *criaNodo(int *registradores, int *memD, struct instrucao *inst, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp);
+void fback(int *registradores, int *memD, struct instrucao *inst, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose);
+back *printn(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis *var, struct regiS *regTemp);
+int isEmpty(Pilha* pilha);

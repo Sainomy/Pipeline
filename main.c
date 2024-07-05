@@ -4,7 +4,8 @@
 #include <ncurses.h>
 
 int main(){
-   initscr();            // Inicia o modo ncurses
+   
+    initscr();            // Inicia o modo ncurses
     cbreak();             // Desativa o buffering de linha
     noecho();             // Desativa a exibição dos caracteres digitados
     curs_set(FALSE);      // Oculta o cursor
@@ -26,7 +27,6 @@ int main(){
   	mvwprintw(startwin, 10, 20, "| (o) | |");
   	mvwprintw(startwin, 11, 20, "|_____|/ ");
   	mvwprintw(startwin, 15, 15, "[Pressione ENTER para Iniciar]");
-
              // E
   int *pc = (int *)malloc(sizeof(int));
   *pc = 0;
@@ -44,28 +44,35 @@ int main(){
   
   struct variaveis *var = inciarVariaveis();
   
+  char p;
+  
   int op = 0;
   
   //////////
-  carregarMemoria("instrucoes.txt", regmem);
-   wrefresh(startwin);
-        int ch = wgetch(startwin);
-        if (ch == '\n') {  // Verifica se o usuário pressionou Enter
-            delwin(startwin); 
-             WINDOW *menuwin = newwin(22, 62, (height / 2) - 11, (width / 2) - 31);
-             WINDOW *regwin = newwin(10, 30, 1, 1);
-             WINDOW *regtwin = newwin(10, 30, 12, 1);
-             WINDOW *memwin = newwin(10, 120, 42, 30);
+    carregarMemoria("t.txt", regmem);
+  
+	wrefresh(startwin);
+
+	int ch = wgetch(startwin);
+	
+	if (ch == '\n') {  // Verifica se o usuário pressionou Enter
+		delwin(startwin); 
+		WINDOW *menuwin = newwin(22, 62, (height / 2) - 11, (width / 2) - 31);
+		WINDOW *regwin = newwin(10, 30, 1, 1);
+		WINDOW *regtwin = newwin(10, 30, 12, 1);
+		WINDOW *memwin = newwin(10, 120, 42, 30);
+	
+		menuview(menuwin);
   do{
     // Deleta a janela inicial
             //cria as janelas
-              exibir_registradores(regwin, registradores);
-              exibir_memoria(memwin, memD);
-              //exibir_regt(regtwin, regis); //como que chama os registradores temporarios aqui?
-              char p = menuview(menuwin);
+             // exibir_registradores(regwin, registradores);
+            //  exibir_memoria(memwin, memD);
+              //exibir_regt(regtwin, regis); //como que chama os registradores temporarios aqui? como assim? coloca o nome deles e os valores que tem dentro, tem uma função antiga que faz isso, verRegT
              
     if(op!=1){ 
-
+			  setbuf(stdin, NULL);
+			  scanf("%c", &p);
               op=menu(sinais, pc, regS1, registradores, memD, var, pilha, p);
                   if(op == 3){
               break;
@@ -73,15 +80,13 @@ int main(){
 
             // Deleta as janelas antes de encerrar
            
-            //delwin(menuwin);
+            delwin(menuwin);
           
-           // delwin(regwin);
-           // delwin(memwin);
-           // delwin(instmem);
+            delwin(regwin);
+            delwin(memwin);
+            //delwin(instmem);
         }
      
-    
-    
    
   //////
  
@@ -133,7 +138,7 @@ int main(){
     var->muxDVC = 1;
   }
   if(var->muxDVC == 1){
-    var->muxDVC = *pc + 1 + regS1->ex_mem->inst->b5_0;
+    var->muxDVC = regS1->ex_mem->pc + 1 + regS1->ex_mem->inst->b5_0;
   }
   else{
     var->muxDVC = *pc + 1;
@@ -143,7 +148,7 @@ int main(){
     var->muxDVI = var->muxDVC;
   }
   else{
-    var->muxDVI = /* complemeta com pc + 1 */ regS1->ex_mem->inst->b0_6;
+    var->muxDVI = regS1->ex_mem->pc + 1 + regS1->ex_mem->inst->b0_6;
   }
   
   *regS2->mem_er->inst = *regS1->ex_mem->inst;
@@ -166,7 +171,8 @@ int main(){
   ////////////////
   
   regS1 = copy(regS2);
-
+  
+/*
 	printf("\n\nDados ao fim do ciclo");
 	printf("\n\nRegistradores Temporários\n");
 	verRegT(regS1);
@@ -176,7 +182,7 @@ int main(){
 	verSinais(sinais);
 	printf("\n\nBanco de Registradores\n");
 	verReg(registradores);
-
+*/
   fback(registradores, memD, regS1->bi_di->inst,  pc, sinais, var, regS1,  pilha, 0);
   //////////
    

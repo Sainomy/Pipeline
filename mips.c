@@ -256,16 +256,19 @@ struct controle * iniciarConrole(){
   //aux->FontePC=0;
   return aux;
 }
-char menuview(WINDOW *menuwin) {
-    box(menuwin, 0, 0);
+void menuview(WINDOW *menuwin) {
+
+	box(menuwin, 0, 0);
     keypad(menuwin, TRUE); // Habilita captura de teclas especiais
     wrefresh(menuwin);
 
+
     // Desenhando o cabeçalho
+    
     mvwprintw(menuwin, 1, 2, "                                         ----                   ");
     mvwprintw(menuwin, 2, 2, "                          PIPELINE      |( )|                   ");
     mvwprintw(menuwin, 3, 2, "                                        ----                    ");
-
+	
    // mvwprintw(menuwin, 5, 2, "\tPC: %i Instrução: %s Estado: %i", 0, "NOP", 0);  // Valores de exemplo
     mvwprintw(menuwin, 7, 2, "\tInstrução em Assembly:");
     mvwprintw(menuwin, 9, 2, "\t(r) (RUN) Executar todo o arquivo");
@@ -286,12 +289,13 @@ char menuview(WINDOW *menuwin) {
     mvwprintw(menuwin, 22, 2, "\tSelecione: p: ");
 
     wrefresh(menuwin);
-    char p = wgetch(menuwin);  // Captura a entrada do usuário
-    return p;
+	
 }
 
 int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, char p){
-
+  if(p == '\n'){
+	  p = 'e';
+  }
   //char p;
 
   /*printf("\n\n================================================================\n");
@@ -335,18 +339,12 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       }
       return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
-    /*
+    
     case 'v':
 	  verEstado(regis);
-      return menu(sinais, PC, regis, registrador, mem, var);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
-    
-    case 'a':
-    verInstrucaoAtual(mem, *PC);
-    //  verinstrucoes(mem,count,0, n_instrucoes);
-      return menu(sinais, mem, PC, regitemp, registrador, pilha);
-      break;
-      */
+      
     case 'i':
       verReg(registrador);
        
@@ -378,8 +376,10 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       printf("Programa finalizado\n");
       return 3;
       break;
+      
     default:
       printf("Opção inválida\n");
+      scanf("%c", &p);
       return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
       break;
     
@@ -396,6 +396,7 @@ int * iniciarRegi(){
   return aux;
 
 };
+
 // Função para exibir a janela dos registradores
 void exibir_registradores(WINDOW *regwin, int *registrador) {
     box(regwin, 0, 0);
@@ -524,39 +525,39 @@ struct regiS * copy(struct regiS *regS2){
 };
 
 void verEstado(struct regiS  *regis){
-		printf("\nBI_DI [%s]", regis->bi_di->inst->instrucao);
-		printf("\nDI EX [%s]", regis->di_ex->inst->instrucao);
-		printf("\nEX_MEM [%s]", regis->ex_mem->inst->instrucao);
-		printf("\nMEM_ER [%s]", regis->mem_er->inst->instrucao);
+		printw("\nBI_DI [%s]", regis->bi_di->inst->instrucao);
+		printw("\nDI EX [%s]", regis->di_ex->inst->instrucao);
+		printw("\nEX_MEM [%s]", regis->ex_mem->inst->instrucao);
+		printw("\nMEM_ER [%s]", regis->mem_er->inst->instrucao);
 };
 
 void verReg(int *registrador){
   for(int i=0;i<8;i++){
-    printf("\nRegistrador %i: %i \n",i, registrador[i]);
+    printw("\nRegistrador %i: %i \n",i, registrador[i]);
   }
 }
 
 void vermemoria(int *mem){
 	for(int i=0;i<256;i++){
-		printf("\n[%i]: %i \n",i, mem[i]);
+		printw("\n[%i]: %i \n",i, mem[i]);
 	  }	
 };
 
 void verRegT(struct regiS  *regisT){
 	
-	printf("\n\nBI_DI \nInstrução: [%s]\nPC: %i", regisT->bi_di->inst->instrucao, regisT->bi_di->pc);
-	printf("\n\nDI EX \nInstrução: [%s]\nPC: %i\nA: %i\nB: %i", regisT->di_ex->inst->instrucao, regisT->di_ex->pc, regisT->di_ex->A, regisT->di_ex->B);
-	printf("\n\nEX_MEM\nInstrução: [%s]\nPC: %i\nSa´da ULA: %i\nB: %i\nRegistrador destino: %i", regisT->ex_mem->inst->instrucao, regisT->ex_mem->pc, regisT->ex_mem->saidaULA, regisT->ex_mem->B, regisT->ex_mem->muxRegDst);
-	printf("\n\nMEM_ER\nInstrução: [%s]\nPC: %i\nRegistrador destino: %i", regisT->mem_er->inst->instrucao, regisT->mem_er->pc, regisT->mem_er->muxRegDst);
+	printw("\n\nBI_DI \nInstrução: [%s]\nPC: %i", regisT->bi_di->inst->instrucao, regisT->bi_di->pc);
+	printw("\n\nDI EX \nInstrução: [%s]\nPC: %i\nA: %i\nB: %i", regisT->di_ex->inst->instrucao, regisT->di_ex->pc, regisT->di_ex->A, regisT->di_ex->B);
+	printw("\n\nEX_MEM\nInstrução: [%s]\nPC: %i\nSa´da ULA: %i\nB: %i\nRegistrador destino: %i", regisT->ex_mem->inst->instrucao, regisT->ex_mem->pc, regisT->ex_mem->saidaULA, regisT->ex_mem->B, regisT->ex_mem->muxRegDst);
+	printw("\n\nMEM_ER\nInstrução: [%s]\nPC: %i\nRegistrador destino: %i", regisT->mem_er->inst->instrucao, regisT->mem_er->pc, regisT->mem_er->muxRegDst);
 	
 };
 
 void verVariaveis(struct variaveis *var){
-	printf("\nFlag: %i, \nmuxDVC: %i, \nmuxDVI: %i, \nmuxloaD: %i, \nmuxRegDst: %i, \nmuxMemReg: %i, \nmuxULA: %i, \nsaida1: %i, \nsaida2: %i, \nULA: %i, \nsaidaMem: %i", *var->flag, var->muxDVC, var->muxDVI, var->muxloaD, var->muxRegDst, var->muxMemReg, var->muxULA, *var->saida1, *var->saida2, *var->ULA, *var->saidaMem); 
+	printw("\nFlag: %i, \nmuxDVC: %i, \nmuxDVI: %i, \nmuxloaD: %i, \nmuxRegDst: %i, \nmuxMemReg: %i, \nmuxULA: %i, \nsaida1: %i, \nsaida2: %i, \nULA: %i, \nsaidaMem: %i", *var->flag, var->muxDVC, var->muxDVI, var->muxloaD, var->muxRegDst, var->muxMemReg, var->muxULA, *var->saida1, *var->saida2, *var->ULA, *var->saidaMem); 
 };
 
 void verSinais(struct controle *sinais){
-	printf("\nmuxEscMem: %i, \nRegDst: %i, \nEscReg: %i, \nMemParaReg: %i, \nULAFonte: %i, \nULAOp: %i, \nDVI: %i, \nDVC: %i",sinais->EscMem, sinais->RegDst, sinais->EscReg, sinais->MemParaReg, sinais->ULAFonte, sinais->ULAOp, sinais->DVI, sinais->DVC);
+	printw("\nmuxEscMem: %i, \nRegDst: %i, \nEscReg: %i, \nMemParaReg: %i, \nULAFonte: %i, \nULAOp: %i, \nDVI: %i, \nDVC: %i",sinais->EscMem, sinais->RegDst, sinais->EscReg, sinais->MemParaReg, sinais->ULAFonte, sinais->ULAOp, sinais->DVI, sinais->DVC);
 };
 
 back *printn(int *registradores, int *memD, struct instrucao *inst, int pc, struct controle sinais, struct variaveis *var, struct regiS *regTemp){

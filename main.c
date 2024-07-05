@@ -44,8 +44,6 @@ int main(){
   
   struct variaveis *var = inciarVariaveis();
   
-  char p;
-  
   int op = 0;
   
   //////////
@@ -55,39 +53,38 @@ int main(){
 
 	int ch = wgetch(startwin);
 	
-	if (ch == '\n') {  // Verifica se o usuário pressionou Enter
+	//if (ch == '\n') {  // Verifica se o usuário pressionou Enter
+  //getch();
 		delwin(startwin); 
-		WINDOW *menuwin = newwin(22, 62, (height / 2) - 11, (width / 2) - 31);
-		WINDOW *regwin = newwin(10, 30, 1, 1);
-		WINDOW *regtwin = newwin(10, 30, 12, 1);
-		WINDOW *memwin = newwin(10, 120, 42, 30);
+		WINDOW *menuwin = newwin(24, 62, (height / 2) - 12, (width / 2) - 31);
+		WINDOW *regwin = newwin(11, 30, 42, 1);
+		WINDOW *regtwin = newwin(25, 40, 17, 1);
+    refresh();
+		WINDOW *memwin = newwin(11, 120, 42, 35);
+    refresh();
 	
-		menuview(menuwin);
+    exibir_registradores(regwin, registradores);
+    exibir_regt(regtwin, regS1); //como que chama os registradores temporarios aqui? como assim? coloca o nome deles e os valores que tem dentro, tem uma função antiga que faz isso, verRegT
+    exibir_memoria(memwin, memD);
+		//menuview(menuwin, pc);
+
   do{
-    // Deleta a janela inicial
-            //cria as janelas
-             // exibir_registradores(regwin, registradores);
-            //  exibir_memoria(memwin, memD);
-              //exibir_regt(regtwin, regis); //como que chama os registradores temporarios aqui? como assim? coloca o nome deles e os valores que tem dentro, tem uma função antiga que faz isso, verRegT
              
     if(op!=1){ 
-			  setbuf(stdin, NULL);
-			  scanf("%c", &p);
-              op=menu(sinais, pc, regS1, registradores, memD, var, pilha, p);
-                  if(op == 3){
-              break;
-              }
-
+      op=menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, regwin);
+          exibir_registradores(regwin, registradores);
+          exibir_regt(regtwin, regS1); //como que chama os registradores temporarios aqui? como assim? coloca o nome deles e os valores que tem dentro, tem uma função antiga que faz isso, verRegT
+          exibir_memoria(memwin, memD);
+      refresh();
+       if(op == 3){
+          break;
+        }
             // Deleta as janelas antes de encerrar
-           
-            delwin(menuwin);
-          
-            delwin(regwin);
-            delwin(memwin);
+           // delwin(menuwin); 
+           // delwin(regwin);
+          //  delwin(memwin);
             //delwin(instmem);
         }
-     
-   
   //////
  
   *pc = var->muxDVI;
@@ -190,5 +187,8 @@ int main(){
   }while(1);
  endwin(); 
 return 0;
-}
+//}
+/*else{
+  mvwprintw(startwin, 15, 15, "[Pressione ENTER para Iniciar]");
+}*/
 }

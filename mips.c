@@ -256,20 +256,19 @@ struct controle * iniciarConrole(){
   //aux->FontePC=0;
   return aux;
 }
-void menuview(WINDOW *menuwin) {
 
-	box(menuwin, 0, 0);
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *regwin){
+
+  //*PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual
+ 
+  	box(menuwin, 0, 0);
     keypad(menuwin, TRUE); // Habilita captura de teclas especiais
     wrefresh(menuwin);
-
-
     // Desenhando o cabeçalho
-    
-    mvwprintw(menuwin, 1, 2, "                                         ----                   ");
-    mvwprintw(menuwin, 2, 2, "                          PIPELINE      |( )|                   ");
-    mvwprintw(menuwin, 3, 2, "                                        ----                    ");
-	
-   // mvwprintw(menuwin, 5, 2, "\tPC: %i Instrução: %s Estado: %i", 0, "NOP", 0);  // Valores de exemplo
+    mvwprintw(menuwin, 1, 2, "\t");
+    mvwprintw(menuwin, 2, 2, "\t\t\tPIPELINE\t\t");
+    mvwprintw(menuwin, 3, 2, "\t");
+    mvwprintw(menuwin, 5, 2, "\tPC: %i Instrução:  Estado: ", *PC);  // Valores de exemplo
     mvwprintw(menuwin, 7, 2, "\tInstrução em Assembly:");
     mvwprintw(menuwin, 9, 2, "\t(r) (RUN) Executar todo o arquivo");
     mvwprintw(menuwin, 10, 2, "\t(e) (STEP) Executar uma linha");
@@ -282,48 +281,18 @@ void menuview(WINDOW *menuwin) {
     mvwprintw(menuwin, 17, 2, "\t(s) Ver Sinais");
     mvwprintw(menuwin, 18, 2, "\t(t) Ver Variáveis");
     mvwprintw(menuwin, 19, 2, "\t(c) Ver Registradores Temporários");
-    //mvwprintw(menuwin, 16, 2, "\t(s) Salvar .asm");
-   // mvwprintw(menuwin, 17, 2, "\t(t) Salvar .dat");
+    mvwprintw(menuwin, 16, 2, "\t(m) Salvar .asm");
+    mvwprintw(menuwin, 17, 2, "\t(l) Salvar .dat");
     mvwprintw(menuwin, 20, 2, "\t(x) Sair");
-    mvwprintw(menuwin, 21, 2, "****************************************************************");
-    mvwprintw(menuwin, 22, 2, "\tSelecione: p: ");
-
+    mvwprintw(menuwin, 21, 2, "\t");
+    //mvwprintw(menuwin, 22, 2, "\tSelecione: p: ");
     wrefresh(menuwin);
-	
-}
-
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, char p){
-  if(p == '\n'){
-	  p = 'e';
+    char op =  getch();
+    
+	 if(op == '\n'){
+	  op = 'e';
   }
-  //char p;
-
-  /*printf("\n\n================================================================\n");
-  printf("\t\t\t    PIPELINE\n");
-  printf("================================================================\n");
-  printf("\t    PC: %i Instrução: %s Estado: %i\n\n", *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual);
-  printf("\t    Instrução em Assembly: ");
-  if(mem->d_i==1){
-    traduzirInstrucao(mem, PC);
-  }
-  
-  printf("\n");
-  printf("\t\t (r) (RUN) Executar todo o arquivo    \n");
-  printf("\t\t (e) (STEP) Executar uma linha        \n");
-  printf("\t\t (b) (BACK) Voltar uma instrução      \n");
-  printf("\t\t (v) Ver Estado                       \n");
-  printf("\t\t (a) Ver Instrução Atual             \n");
-  printf("\t\t (i) Ver registradores               \n");
-  printf("\t\t (d) Ver Memória de Dados            \n");
-  printf("\t\t (s) Ver Sinais                      \n");
-  printf("\t\t (t) Ver Variáveis                   \n");
-  printf("\t\t (c) Ver Registradores Temporários   \n");
-  printf("\t\t (x) Sair                            \n");
-  printf("================================================================\n");
-  printf("\t\tSelecione: ");
-  scanf("%s",&p);*/
-
-  switch(p){
+  switch(op){
     case 'r':
       return 1;
       break;
@@ -337,39 +306,40 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       else {
         printf("Nenhuma instrução para voltar\n");
       }
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, regwin);
       break;
     
     case 'v':
 	  verEstado(regis);
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, regwin);
       break;
       
     case 'i':
-      verReg(registrador);
-       
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
+     //exibir_registradores(regwin, registrador);
+     registrador[2] = 1;
+       wrefresh(regwin);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, regwin);
       break;
     case 'd':
       vermemoria(mem);
        
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, regwin);
       break;
    
     case 'c':
       verRegT(regis);
        
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, regwin);
       break;
     case 't':
       verVariaveis(var);
       
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, regwin);
       break;
     case 's':
       verSinais(sinais);
       
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, regwin);
       break;
    
     case 'x':
@@ -378,9 +348,9 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       break;
       
     default:
-      printf("Opção inválida\n");
-      scanf("%c", &p);
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, p);
+      //printf("Opção inválida\n");
+      scanf("%c", &op);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, regwin);
       break;
     
   }
@@ -411,27 +381,48 @@ void exibir_registradores(WINDOW *regwin, int *registrador) {
 
 // Função para exibir a janela da memória
 void exibir_memoria(WINDOW *memwin, int *mem) {
-    box(memwin, 0, 0);
-    mvwprintw(memwin, 1, 1, "Memória");
+   box(memwin, 0, 0);
+    mvwprintw(memwin, 1, 1, "Memória de Dados");
     
-    for(int i=0;i<256;i++){
-		mvwprintw(memwin, 2 + i, 1,"\n[%i]: %i \n",i, mem[i]);
-	  }	
-
+    for (int i = 0; i < 256; i++) {
+        mvwprintw(memwin, (i / 38) + 2, (i % 40) * 7 + 1, " %d",  mem[i]);
+        if (i % 16 == 15) {
+            wrefresh(memwin);
+        }
+    }
     wrefresh(memwin);
 }
-void exibir_regt(WINDOW *regtwin, struct regiS  *regisT) {
+void exibir_regt(WINDOW *regtwin, struct regiS *regisT) {
+    // Limpa a janela antes de desenhar
+    wclear(regtwin);
     box(regtwin, 0, 0);
-    mvwprintw(regtwin, 1, 1, "Memória de Instruções");
+    mvwprintw(regtwin, 1, 1, "Registradores Temporários");
 
-	  mvwprintw(regtwin, 2 , 1,"\n\nBI_DI \nInstrução: [%s]\nPC: %i", regisT->bi_di->inst->instrucao, regisT->bi_di->pc);
-	  mvwprintw(regtwin, 3 , 1,"\n\nDI EX \nInstrução: [%s]\nPC: %i\nA: %i\nB: %i", regisT->di_ex->inst->instrucao, regisT->di_ex->pc, regisT->di_ex->A, regisT->di_ex->B);
-	  mvwprintw(regtwin, 4 , 1,"\n\nEX_MEM\nInstrução: [%s]\nPC: %i\nSa´da ULA: %i\nB: %i\nRegistrador destino: %i", regisT->ex_mem->inst->instrucao, regisT->ex_mem->pc, regisT->ex_mem->saidaULA, regisT->ex_mem->B, regisT->ex_mem->muxRegDst);
-	  mvwprintw(regtwin, 5 , 1,"\n\nMEM_ER\nInstrução: [%s]\nPC: %i\nRegistrador destino: %i", regisT->mem_er->inst->instrucao, regisT->mem_er->pc, regisT->mem_er->muxRegDst);
-  
+    mvwprintw(regtwin, 2, 1, "BI_DI");
+    mvwprintw(regtwin, 3, 1, "Instrução: [%s]", regisT->bi_di->inst->instrucao);
+    mvwprintw(regtwin, 4, 1, "PC: %i", regisT->bi_di->pc);
+
+    mvwprintw(regtwin, 6, 1, "DI_EX");
+    mvwprintw(regtwin, 7, 1, "Instrução: [%s]", regisT->di_ex->inst->instrucao);
+    mvwprintw(regtwin, 8, 1, "PC: %i", regisT->di_ex->pc);
+    mvwprintw(regtwin, 9, 1, "A: %i", regisT->di_ex->A);
+    mvwprintw(regtwin, 10, 1, "B: %i", regisT->di_ex->B);
+
+    mvwprintw(regtwin, 12, 1, "EX_MEM");
+    mvwprintw(regtwin, 13, 1, "Instrução: [%s]", regisT->ex_mem->inst->instrucao);
+    mvwprintw(regtwin, 14, 1, "PC: %i", regisT->ex_mem->pc);
+    mvwprintw(regtwin, 15, 1, "Saída ULA: %i", regisT->ex_mem->saidaULA);
+    mvwprintw(regtwin, 16, 1, "B: %i", regisT->ex_mem->B);
+    mvwprintw(regtwin, 17, 1, "Registrador destino: %i", regisT->ex_mem->muxRegDst);
+
+    mvwprintw(regtwin, 19, 1, "MEM_ER");
+    mvwprintw(regtwin, 20, 1, "Instrução: [%s]", regisT->mem_er->inst->instrucao);
+    mvwprintw(regtwin, 21, 1, "PC: %i", regisT->mem_er->pc);
+    mvwprintw(regtwin, 22, 1, "Registrador destino: %i", regisT->mem_er->muxRegDst);
+
+    // Atualiza a janela com as novas informações
     wrefresh(regtwin);
 }
-
 int * iniciarMemD(){
 
   int *aux=(int *)malloc(256*sizeof(int));  

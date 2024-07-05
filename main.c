@@ -59,23 +59,15 @@ int main(){
 		WINDOW *menuwin = newwin(24, 62, (height / 2) - 12, (width / 2) - 31);
 		WINDOW *regwin = newwin(11, 30, 42, 1);
 		WINDOW *regtwin = newwin(25, 40, 17, 1);
-    refresh();
 		WINDOW *memwin = newwin(11, 120, 42, 35);
-    refresh();
-	
-    exibir_registradores(regwin, registradores);
-    exibir_regt(regtwin, regS1); //como que chama os registradores temporarios aqui? como assim? coloca o nome deles e os valores que tem dentro, tem uma função antiga que faz isso, verRegT
-    exibir_memoria(memwin, memD);
-		//menuview(menuwin, pc);
 
   do{
              
     if(op!=1){ 
-      op=menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, regwin);
+      op=menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin);
           exibir_registradores(regwin, registradores);
           exibir_regt(regtwin, regS1); //como que chama os registradores temporarios aqui? como assim? coloca o nome deles e os valores que tem dentro, tem uma função antiga que faz isso, verRegT
           exibir_memoria(memwin, memD);
-      refresh();
        if(op == 3){
           break;
         }

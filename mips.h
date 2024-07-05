@@ -145,7 +145,7 @@ void exibir_registradores(WINDOW *regwin, int *registrador);
 void exibir_memoria(WINDOW *memwin, int *mem);
 void exibir_regt(WINDOW *regtwin, struct regiS  *regisT);
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *regwin);
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin);
 
 int * iniciarRegi();
 int * iniciarMemD();

@@ -27,8 +27,7 @@ int main(){
   	mvwprintw(startwin, 10, 20, "| (o) | |");
   	mvwprintw(startwin, 11, 20, "|_____|/ ");
   	mvwprintw(startwin, 15, 15, "[Pressione ENTER para Iniciar]");
-             // 
-             
+             //            
   int *pc = (int *)malloc(sizeof(int));
   *pc = 0;
   
@@ -50,14 +49,11 @@ int main(){
   int op = 0;
   
   //////////
-  carregarMemoria("t.txt", regmem);
+  int n_instrucoes = carregarMemoria("t.txt", regmem);
   
   wrefresh(startwin);
-
-	int ch = wgetch(startwin);
+	wgetch(startwin);
 	
-	//if (ch == '\n') {  // Verifica se o usuário pressionou Enter
-  //getch();
 		delwin(startwin); 
 		WINDOW *menuwin = newwin(24, 62, (height / 2) - 12, (width / 2) - 31);
 		WINDOW *regwin = newwin(11, 30, 42, 1);
@@ -65,6 +61,14 @@ int main(){
 		WINDOW *memwin = newwin(11, 120, 42, 35);
   
   do{
+	 
+	  fback(registradores, memD, pc, sinais, var, regS1, pilha, 0); 
+	  
+	if(*(pc)==(5+n_instrucoes)){
+			mvwprintw(menuwin, 21, 2, "Todas as instrruções foram execudas");
+			op = 0;
+			}
+			
     if(op!=1){ 
 		
 		  exibir_registradores(regwin, registradores);
@@ -166,21 +170,7 @@ int main(){
   ////////////////
   
   regS1 = copy(regS2);
-  
-  fback(registradores, memD, pc, sinais, var, regS1, pilha, 0);
 
-	/*
-	printf("\n\nDados ao fim do ciclo");
-	printf("\n\nRegistradores Temporários\n");
-	verRegT(regS1);
-	printf("\n\nVariáveis\n");
-	verVariaveis(var);
-	printf("\n\nSinais\n");
-	verSinais(sinais);
-	printf("\n\nPC %i\n", *pc);
-	printf("\n\nBanco de Registradores\n");
-	verReg(registradores);
-	*/
   //////////
     
   }while(1);

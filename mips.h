@@ -12,9 +12,7 @@ struct instrucao{
 };
 
 struct controle{
-  //int louD;
   int EscMem;
-  //int IREsc;
   int RegDst;
   int EscReg;
   int MemParaReg;
@@ -102,11 +100,11 @@ typedef struct{
 	
   int *registradores;
   int *memD;
-  struct instrucao *inst;
+ // struct instrucao *inst;
   int pc;
   struct controle sinais;
   struct variaveis var;
-  struct regiS regTemp;
+  struct regiS *regTemp;
 
 }back;
 
@@ -133,7 +131,7 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits);
 
 //funcoes de apoio
 
-void carregarMemoria(char *nomeArquivo, struct instrucao *mem);
+int carregarMemoria(char *nomeArquivo, struct instrucao *mem);
 
 int bi_dec(char *bin);
 

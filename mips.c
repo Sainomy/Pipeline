@@ -158,7 +158,7 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
 
 //funcoes de apoio
 
-void carregarMemoria(char *nomeArquivo, struct instrucao *mem){
+int carregarMemoria(char *nomeArquivo, struct instrucao *mem){
   
   int i=0;
   FILE *arquivo;
@@ -166,7 +166,7 @@ void carregarMemoria(char *nomeArquivo, struct instrucao *mem){
 
   if (arquivo == NULL) {
     printf("Erro ao abrir o arquivo.\n");
-    return;
+    return 0;
   }
 
   while (fscanf(arquivo, "%16s", mem[i].instrucao) != EOF && i < 256) {
@@ -176,6 +176,7 @@ void carregarMemoria(char *nomeArquivo, struct instrucao *mem){
     i++;
   }
   fclose(arquivo);
+  return i;
 }
 
 int bi_dec(char *bin){
@@ -506,12 +507,45 @@ void fback(int *registradores, int *memD, int *pc, struct controle *sinais, stru
       memD[i] = pilha->top->estado->memD[i];
     }
     *sinais = pilha->top->estado->sinais;
-    *var = pilha->top->estado->var;
-    regTemp->bi_di = pilha->top->estado->regTemp.bi_di;
-    regTemp->di_ex = pilha->top->estado->regTemp.di_ex;
-    regTemp->ex_mem = pilha->top->estado->regTemp.ex_mem;
-    regTemp->mem_er = pilha->top->estado->regTemp.mem_er;
-    pop(pilha);
+   
+  *var->flag = *pilha->top->estado->var.flag;
+  var->muxDVC = pilha->top->estado->var.muxDVC;
+  var->muxDVI = pilha->top->estado->var.muxDVI;
+  var->muxloaD = pilha->top->estado->var.muxloaD;
+  var->muxRegDst = pilha->top->estado->var.muxRegDst;
+  var->muxMemReg = pilha->top->estado->var.muxMemReg;
+  var->muxULA = pilha->top->estado->var.muxULA;
+  *var->saida1 = *pilha->top->estado->var.saida1;
+  *var->saida2 = *pilha->top->estado->var.saida2;
+  *var->ULA = *pilha->top->estado->var.ULA;
+  *var->saidaMem = *pilha->top->estado->var.saidaMem;
+  
+  regTemp->bi_di->pc = pilha->top->estado->regTemp->bi_di->pc;
+  *regTemp->bi_di->inst = *pilha->top->estado->regTemp->bi_di->inst;
+  
+  regTemp->di_ex->A = pilha->top->estado->regTemp->di_ex->A;
+  regTemp->di_ex->B = pilha->top->estado->regTemp->di_ex->B;
+  regTemp->di_ex->pc = pilha->top->estado->regTemp->di_ex->pc;
+  *regTemp->di_ex->sinais = *pilha->top->estado->regTemp->di_ex->sinais;
+  *regTemp->di_ex->inst = *pilha->top->estado->regTemp->di_ex->inst;
+     
+  regTemp->ex_mem->pc = pilha->top->estado->regTemp->ex_mem->pc;
+  regTemp->ex_mem->saidaULA = pilha->top->estado->regTemp->ex_mem->saidaULA;
+  regTemp->ex_mem->B = pilha->top->estado->regTemp->ex_mem->B;
+  regTemp->ex_mem->muxRegDst = pilha->top->estado->regTemp->ex_mem->muxRegDst;  
+  regTemp->ex_mem->flag = pilha->top->estado->regTemp->ex_mem->flag;
+  *regTemp->ex_mem->sinais = *pilha->top->estado->regTemp->ex_mem->sinais;
+  *regTemp->ex_mem->inst = *pilha->top->estado->regTemp->ex_mem->inst;
+  
+  
+  regTemp->mem_er->pc = pilha->top->estado->regTemp->mem_er->pc;
+  regTemp->mem_er->muxRegDst = pilha->top->estado->regTemp->mem_er->muxRegDst;
+  regTemp->mem_er->saidaULA = pilha->top->estado->regTemp->mem_er->saidaULA;
+  regTemp->mem_er->saidaMem = pilha->top->estado->regTemp->mem_er->saidaMem;
+  *regTemp->mem_er->inst = *pilha->top->estado->regTemp->mem_er->inst;
+  *regTemp->mem_er->sinais = *pilha->top->estado->regTemp->mem_er->sinais;
+    
+   pop(pilha);
   }
 }
 
@@ -542,37 +576,55 @@ Nodo *criaNodo(int *registradores, int *memD, int *pc, struct controle *sinais, 
 
 back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp){
   back *aux=iniciarBack();
+  
   aux->pc = *pc;
+  
   for(int i = 0; i<8; i++){
     aux->registradores[i] = registradores[i];
   }
   for(int i = 0; i<256; i++){
     aux->memD[i] = memD[i];
   }
-  aux->sinais.EscMem = sinais->EscMem;
-  aux->sinais.RegDst = sinais->RegDst;
-  aux->sinais.EscReg = sinais->EscReg;
-  aux->sinais.MemParaReg = sinais->MemParaReg;
-  aux->sinais.ULAOp = sinais->ULAFonte;
-  aux->sinais.ULAFonte = sinais->ULAOp;
-  aux->sinais.DVI = sinais->DVI;
-  aux->sinais.DVC = sinais->DVC;
   
+  aux->sinais = *sinais;
+  
+  *aux->var.flag = *var->flag;
   aux->var.muxDVC = var->muxDVC;
   aux->var.muxDVI = var->muxDVI;
   aux->var.muxloaD = var->muxloaD;
   aux->var.muxRegDst = var->muxRegDst;
   aux->var.muxMemReg = var->muxMemReg;
   aux->var.muxULA = var->muxULA;
-  aux->var.saida1 = var->saida1;
-  aux->var.saida2 = var->saida2;
-  aux->var.ULA = var->ULA;
-  aux->var.saidaMem = var->saidaMem;
+  *aux->var.saida1 = *var->saida1;
+  *aux->var.saida2 = *var->saida2;
+  *aux->var.ULA = *var->ULA;
+  *aux->var.saidaMem = *var->saidaMem;
   
-  aux->regTemp.bi_di = regTemp->bi_di;
-  aux->regTemp.di_ex = regTemp->di_ex;
-  aux->regTemp.ex_mem = regTemp->ex_mem;
-  aux->regTemp.mem_er = regTemp->mem_er;
+  aux->regTemp->bi_di->pc = regTemp->bi_di->pc;
+  *aux->regTemp->bi_di->inst = *regTemp->bi_di->inst;
+  
+  aux->regTemp->di_ex->A = regTemp->di_ex->A;
+  aux->regTemp->di_ex->B = regTemp->di_ex->B;
+  aux->regTemp->di_ex->pc = regTemp->di_ex->pc;
+  *aux->regTemp->di_ex->sinais = *regTemp->di_ex->sinais;
+  *aux->regTemp->di_ex->inst = *regTemp->di_ex->inst;
+     
+  aux->regTemp->ex_mem->pc = regTemp->ex_mem->pc;
+  aux->regTemp->ex_mem->saidaULA = regTemp->ex_mem->saidaULA;
+  aux->regTemp->ex_mem->B = regTemp->ex_mem->B;
+  aux->regTemp->ex_mem->muxRegDst = regTemp->ex_mem->muxRegDst;  
+  aux->regTemp->ex_mem->flag = regTemp->ex_mem->flag;
+  *aux->regTemp->ex_mem->sinais= *regTemp->ex_mem->sinais;
+  *aux->regTemp->ex_mem->inst = *regTemp->ex_mem->inst;
+  
+  
+  aux->regTemp->mem_er->pc = regTemp->mem_er->pc;
+  aux->regTemp->mem_er->muxRegDst = regTemp->mem_er->muxRegDst;
+  aux->regTemp->mem_er->saidaULA = regTemp->mem_er->saidaULA;
+  aux->regTemp->mem_er->saidaMem = regTemp->mem_er->saidaMem;
+  *aux->regTemp->mem_er->inst = *regTemp->mem_er->inst;
+  *aux->regTemp->mem_er->sinais = *regTemp->mem_er->sinais;
+  
   
   return aux;
 }
@@ -582,7 +634,14 @@ back * iniciarBack(){
 
     aux->registradores =  iniciarRegi();
     aux->memD = iniciarMemD();
-
+    aux->var.flag = (int *)malloc(sizeof(int));
+    aux->var.saida1 = (int *)malloc(sizeof(int));
+    aux->var.saida2 = (int *)malloc(sizeof(int));
+    aux->var.ULA = (int *)malloc(sizeof(int));
+	aux->var.saidaMem = (int *)malloc(sizeof(int));
+	aux->regTemp = iniciarRegiS();
+	
+	
    return aux;
 }
 

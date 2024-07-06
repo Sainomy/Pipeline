@@ -4,7 +4,7 @@
 #include <ncurses.h>
 
 int main(){
-   
+	
     initscr();            // Inicia o modo ncurses
     cbreak();             // Desativa o buffering de linha
     noecho();             // Desativa a exibição dos caracteres digitados
@@ -27,12 +27,15 @@ int main(){
   	mvwprintw(startwin, 10, 20, "| (o) | |");
   	mvwprintw(startwin, 11, 20, "|_____|/ ");
   	mvwprintw(startwin, 15, 15, "[Pressione ENTER para Iniciar]");
-             // E
+             // 
+             
   int *pc = (int *)malloc(sizeof(int));
   *pc = 0;
   
-  struct instrucao *regmem = (struct instrucao*)malloc(256*sizeof(struct instrucao));
   Pilha *pilha = (Pilha *)malloc(sizeof(Pilha));
+  
+  struct instrucao *regmem = (struct instrucao*)malloc(256*sizeof(struct instrucao));
+  
   int *registradores = iniciarRegi();
   
   int *memD = iniciarMemD();
@@ -47,9 +50,9 @@ int main(){
   int op = 0;
   
   //////////
-    carregarMemoria("t.txt", regmem);
+  carregarMemoria("t.txt", regmem);
   
-	wrefresh(startwin);
+  wrefresh(startwin);
 
 	int ch = wgetch(startwin);
 	
@@ -60,29 +63,28 @@ int main(){
 		WINDOW *regwin = newwin(11, 30, 42, 1);
 		WINDOW *regtwin = newwin(25, 40, 17, 1);
 		WINDOW *memwin = newwin(11, 120, 42, 35);
-
+  
   do{
-             
     if(op!=1){ 
-      op=menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin);
-          exibir_registradores(regwin, registradores);
+		
+		  exibir_registradores(regwin, registradores);
           exibir_regt(regtwin, regS1); //como que chama os registradores temporarios aqui? como assim? coloca o nome deles e os valores que tem dentro, tem uma função antiga que faz isso, verRegT
           exibir_memoria(memwin, memD);
-       if(op == 3){
+          
+         op=menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin);
+
+        if(op == 3){
           break;
         }
-            // Deleta as janelas antes de encerrar
-           // delwin(menuwin); 
-           // delwin(regwin);
-          //  delwin(memwin);
-            //delwin(instmem);
-        }
+    }
+
   //////
  
   *pc = var->muxDVI;
 
   *regS2->bi_di->inst =   memReg(regmem, *pc);;
   regS2->bi_di->pc = *pc +1;
+  
   
   //////////BI/DI
   
@@ -93,9 +95,11 @@ int main(){
   *regS2->di_ex->inst = *regS1->bi_di->inst;
   *regS2->di_ex->sinais = *sinais;
   regS2->di_ex->pc = regS1->bi_di->pc;
+  regS2->di_ex->A = *var->saida1;
+  regS2->di_ex->B = *var->saida2;
+  
   
   //////////DI/EX 
-
   
   if(regS1->di_ex->sinais->RegDst == 0){
     var->muxRegDst = regS1->di_ex->inst->b8_6;
@@ -108,22 +112,23 @@ int main(){
     var->muxULA = regS1->di_ex->inst->b5_0;
   }
   else{
-    var->muxULA = *var->saida2;
+    var->muxULA = regS1->di_ex->B;
   }
 
-  ula(*var->saida1, var->muxULA, var->ULA , var->flag, regS1->di_ex->sinais->ULAOp);
+  ula(regS1->di_ex->A, var->muxULA, var->ULA , var->flag, regS1->di_ex->sinais->ULAOp);
   
   *regS2->ex_mem->sinais = *regS1->di_ex->sinais;
   *regS2->ex_mem->inst = *regS1->di_ex->inst;
   regS2->ex_mem->pc = regS1->di_ex->pc;
   regS2->ex_mem->saidaULA = *var->ULA;
   regS2->ex_mem->muxRegDst = var->muxRegDst;
-  
+  regS2->ex_mem->B = regS1->di_ex->B;
+  regS2->ex_mem->flag = *var->flag;
   //////////EX/MEM
   
-  memDados(memD, *var->ULA, *var->saida2, regS1->ex_mem->sinais->EscMem, var->saidaMem);
+  memDados(memD, regS1->ex_mem->saidaULA,  regS1->ex_mem->B , regS1->ex_mem->sinais->EscMem, var->saidaMem);
 
-  if((*var->flag + regS1->ex_mem->sinais->DVC) == 2){
+  if((regS1->ex_mem->flag + regS1->ex_mem->sinais->DVC) == 2){
     var->muxDVC = 1;
   }
   if(var->muxDVC == 1){
@@ -145,6 +150,7 @@ int main(){
   regS2->mem_er->pc = regS1->ex_mem->pc;
   regS2->mem_er->saidaULA = regS1->ex_mem->saidaULA;
   regS2->mem_er->muxRegDst = regS1->ex_mem->muxRegDst; 
+  regS2->mem_er->saidaMem = *var->saidaMem;
   
   //////////MEM/ER
 
@@ -152,7 +158,7 @@ int main(){
     var->muxMemReg = regS1->mem_er->saidaULA;
   }
   else{
-    var->muxMemReg = *var->saidaMem;
+    var->muxMemReg = regS1->mem_er->saidaMem;
   }
   
   BancoRegistradores(registradores, 0, 0, regS1->mem_er->muxRegDst,  var->muxMemReg, NULL, NULL, regS1->mem_er->sinais->EscReg);
@@ -161,7 +167,9 @@ int main(){
   
   regS1 = copy(regS2);
   
-/*
+  fback(registradores, memD, pc, sinais, var, regS1, pilha, 0);
+
+	/*
 	printf("\n\nDados ao fim do ciclo");
 	printf("\n\nRegistradores Temporários\n");
 	verRegT(regS1);
@@ -169,18 +177,13 @@ int main(){
 	verVariaveis(var);
 	printf("\n\nSinais\n");
 	verSinais(sinais);
+	printf("\n\nPC %i\n", *pc);
 	printf("\n\nBanco de Registradores\n");
 	verReg(registradores);
-*/
-  fback(registradores, memD, regS1->bi_di->inst,  pc, sinais, var, regS1,  pilha, 0);
+	*/
   //////////
-   
-        
+    
   }while(1);
  endwin(); 
 return 0;
-//}
-/*else{
-  mvwprintw(startwin, 15, 15, "[Pressione ENTER para Iniciar]");
-}*/
 }

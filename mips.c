@@ -22,7 +22,7 @@ void memDados(int *memD, int endereco, int dado, int EscMem, int *saida){
 }
 
 void ula(int valor1, int valor2, int *saida, int *flag, int ULAop){
-
+	(*flag) = 0;
 	switch(ULAop){
 	  
 	  case 0:
@@ -782,4 +782,49 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
     
   }
   return 3;
+}
+
+void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq){
+	if(inst.opcode == 8 && flag == 1 && *countBeq == 0){
+		*sinais = zerarSinais();
+		*regTemp->di_ex->sinais = zerarSinais();
+		(*countBeq)++;
+		return;
+	}
+	if(*countBeq == 1){
+	*sinais = zerarSinais();
+	*regTemp->di_ex->sinais = zerarSinais();
+	*regTemp->ex_mem->sinais = zerarSinais();
+	(*countBeq)++;
+	return;
+	}
+	if(*countBeq == 2){
+	//*sinais = zerarSinais();
+	*regTemp->di_ex->sinais = zerarSinais();
+	*regTemp->ex_mem->sinais = zerarSinais();
+	*regTemp->mem_er->sinais = zerarSinais();
+	(*countBeq)++;
+	return;
+	}
+	if(*countBeq == 3){
+		*countBeq = 0;
+		return;
+	}
+	if(*countBeq >= 1){
+	(*countBeq)++;
+	return;
+	}
+}
+
+struct controle zerarSinais(){
+	  struct controle sinais;
+	  sinais.RegDst = 0;
+      sinais.ULAOp = 0;
+      sinais.ULAFonte = 0;
+      sinais.DVC = 0;
+      sinais.DVI = 0;
+      sinais.EscMem = 0;
+      sinais.EscReg = 0;
+      sinais.MemParaReg = 0;
+      return sinais;
 }

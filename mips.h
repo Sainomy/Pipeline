@@ -166,3 +166,7 @@ back * iniciarBack();
 void exibir_registradores(WINDOW *regwin, int *registrador);
 void exibir_memoria(WINDOW *memwin, int *mem);
 void exibir_regt(WINDOW *regtwin, struct regiS  *regisT);
+
+
+void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq);
+struct controle zerarSinais();

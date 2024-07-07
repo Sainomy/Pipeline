@@ -48,6 +48,9 @@ int main(){
   
   int op = 0;
   
+  int *countBeq = (int *)malloc(sizeof(int));
+  *countBeq = 0;
+  
   //////////
   int n_instrucoes = carregarMemoria("t.txt", regmem);
   
@@ -120,6 +123,9 @@ int main(){
   }
 
   ula(regS1->di_ex->A, var->muxULA, var->ULA , var->flag, regS1->di_ex->sinais->ULAOp);
+  
+  HazardControle(regS2, *regS1->di_ex->inst, sinais, *var->flag, countBeq);
+
   
   *regS2->ex_mem->sinais = *regS1->di_ex->sinais;
   *regS2->ex_mem->inst = *regS1->di_ex->inst;

@@ -105,7 +105,7 @@ typedef struct{
   struct controle sinais;
   struct variaveis var;
   struct regiS *regTemp;
-
+  int countdesvio;
 }back;
 
 typedef struct Node {

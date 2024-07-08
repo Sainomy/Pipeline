@@ -140,7 +140,7 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes);
 
 struct controle * iniciarConrole();
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countbeq);
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq);
 
 int * iniciarRegi();
 int * iniciarMemD();
@@ -159,7 +159,7 @@ back * iniciarBack();
 void push(Pilha* stack, back *estado);
 void pop(Pilha* pilha);
 Nodo *criaNodo(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp);
-void fback(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose, int *countbeq);
+void fback(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose, int *countBeq);
 back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp);
 int isEmpty(Pilha* pilha);
 back * iniciarBack();

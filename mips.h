@@ -97,7 +97,7 @@ struct variaveis{
 };
 
 typedef struct{
-	
+
   int *registradores;
   int *memD;
  // struct instrucao *inst;
@@ -139,7 +139,7 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes);
 
 struct controle * iniciarConrole();
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin);
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes);
 
 int * iniciarRegi();
 int * iniciarMemD();
@@ -170,3 +170,6 @@ void exibir_regt(WINDOW *regtwin, struct regiS  *regisT);
 
 void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq);
 struct controle zerarSinais();
+
+void salvarAsm(struct instrucao *regmem, int n_instrucoes);
+void salvarDat(int *memD);

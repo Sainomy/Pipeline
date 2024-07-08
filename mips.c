@@ -178,6 +178,19 @@ int carregarMemoria(char *nomeArquivo, struct instrucao *mem){
   fclose(arquivo);
   return i;
 }
+void carregarDados(char *nomeArquivo, int *memD) {
+    FILE *arquivo;
+    arquivo = fopen("dados.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para carregar.\n");
+        return;
+    }
+    for (int i = 0; i < 256; i++) {
+       fscanf(arquivo, "%d\n", &memD[i]); // Correção aqui
+    }
+    fclose(arquivo);
+    printf("Dados carregados com sucesso do arquivo dados.dat.\n");
+}
 
 int bi_dec(char *bin){
   int i=strlen(bin);
@@ -710,7 +723,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
     wrefresh(menuwin);
     // Desenhando o cabeçalho
     mvwprintw(menuwin, 1, 2, "\t");
-    mvwprintw(menuwin, 2, 2, "\t\t\tPIPELINE\t\t");
+    mvwprintw(menuwin, 2, 2, "\t\t\t\t\t");
     mvwprintw(menuwin, 3, 2, "\t");
     mvwprintw(menuwin, 5, 2, "\tPC: %i Instrução:  Estado: ", *PC);  // Valores de exemplo
     mvwprintw(menuwin, 7, 2, "\tInstrução em Assembly:");
@@ -726,7 +739,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
    // mvwprintw(menuwin, 18, 2, "\t(t) Ver Variáveis");
    // mvwprintw(menuwin, 19, 2, "\t(c) Ver Registradores Temporários");
     mvwprintw(menuwin, 12, 2, "\t(m) Salvar .asm");
-    mvwprintw(menuwin, 13, 2, "\t(l) Salvar .dat");
+    mvwprintw(menuwin, 13, 2, "\t(t) Salvar .dat");
     mvwprintw(menuwin, 14, 2, "\t(x) Sair");
    // mvwprintw(menuwin, 21, 2, "\t");
     //mvwprintw(menuwin, 22, 2, "\tSelecione: p: ");
@@ -898,7 +911,7 @@ void salvarDat(int *memD){
     return;
   }
   for(int i = 0; i < 256; i++){
-    fprintf(arquivo, "%d: %d\n",i, memD[i]);
+    fprintf(arquivo, "%d\n",memD[i]);
   }
   fclose(arquivo);
   printf("\nDados salvos com sucesso.\n");

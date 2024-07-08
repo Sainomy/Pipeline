@@ -132,6 +132,7 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits);
 //funcoes de apoio
 
 int carregarMemoria(char *nomeArquivo, struct instrucao *mem);
+void carregarDados(char *nomeArquivo, int *memD);
 
 int bi_dec(char *bin);
 

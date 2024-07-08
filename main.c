@@ -2,95 +2,143 @@
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+
+void draw_textbox(WINDOW *win, int start_y, int start_x, int width, int height) {
+    box(win, 0, 0);
+    mvwprintw(win, 0, 2, " Text Box ");
+    wrefresh(win);
+}
+
+void get_input(WINDOW *win, char *input, int len) {
+    echo();
+    mvwgetnstr(win, 1, 1, input, len);
+    noecho();
+}
+void draw_pipeline_art(WINDOW *win) {
+    int start_x = (getmaxx(win) - 62) / 2;
+    mvwprintw(win, 5, start_x, "        _____  _  _____  ____  __      _  _    _  ____ ");
+    mvwprintw(win, 6, start_x, "       |  __ || ||  __ ||  __|| |     | || |  | ||  __|");
+    mvwprintw(win, 7, start_x, "       | |__ || || |__ || |__ | |     | || |\\ | || |__ ");
+    mvwprintw(win, 8, start_x, "       |  ___|| ||  ___||  __|| |     | || | \\| ||  __|");
+    mvwprintw(win, 9, start_x, "       | |    | || |    | |__ | |____ | || |  \\ || |__ ");
+   mvwprintw(win, 10, start_x, "       |_|    |_||_|    |____||______||_||_|   \\||____|");
+}
 
 int main() {
+    initscr();      
+    cbreak();       
+    noecho();       
+    curs_set(FALSE); 
 
-  initscr();       // Inicia o modo ncurses
-  cbreak();        // Desativa o buffering de linha
-  noecho();        // Desativa a exibição dos caracteres digitados
-  curs_set(FALSE); // Oculta o cursor
+    int height, width;
+    getmaxyx(stdscr, height, width);
 
-  int height, width;
-  getmaxyx(stdscr, height, width);
+    char inst_file[20] = "t.txt";
+    char data_file[20] = "dados.dat";
+    int *memD = iniciarMemD();
 
-  WINDOW *startwin = newwin(20, 50, (height / 2) - 10, (width / 2) - 25);
-  box(startwin, 0, 0);
-  keypad(startwin, TRUE); // Habilita captura de teclas especiais
-  refresh();
-  wrefresh(startwin);
+    while (1) {
+        WINDOW *startwin = newwin(20, 50, (height / 2) - 10, (width / 2) - 25);
+        box(startwin, 0, 0);
+        keypad(startwin, TRUE);
+        refresh();
+        wrefresh(startwin);
 
-  mvwprintw(startwin, 3, 15, "PIPELINE");
-  mvwprintw(startwin, 6, 20, "  ______");
-  mvwprintw(startwin, 7, 20, " /     /|");
-  mvwprintw(startwin, 8, 20, "/_____/ |");
-  mvwprintw(startwin, 9, 20, "|_____| |");
-  mvwprintw(startwin, 10, 20, "| (o) | |");
-  mvwprintw(startwin, 11, 20, "|_____|/ ");
-  mvwprintw(startwin, 15, 15, "[Pressione ENTER para Iniciar]");
-  //
-  int *pc = (int *)malloc(sizeof(int));
-  *pc = 0;
+        mvwprintw(startwin, 3, 15, "PIPELINE");
+        mvwprintw(startwin, 6, 20, "  ______");
+        mvwprintw(startwin, 7, 20, " /     /|");
+        mvwprintw(startwin, 8, 20, "/_____/ |");
+        mvwprintw(startwin, 9, 20, "|_____| |");
+        mvwprintw(startwin, 10, 20, "| (o) | |");
+        mvwprintw(startwin, 11, 20, "|_____|/ ");
+        mvwprintw(startwin, 13, 5, inst_file);
+        mvwprintw(startwin, 14, 5, data_file);
+        mvwprintw(startwin, 15, 5, "[T para editar t.txt]");
+        mvwprintw(startwin, 16, 5, "[D para editar dados.dat]");
+        mvwprintw(startwin, 17, 15, "[Pressione ENTER para Iniciar]");
+        wrefresh(startwin);
 
-  Pilha *pilha = (Pilha *)malloc(sizeof(Pilha));
+        char ch = wgetch(startwin);
+        if (ch == '\n') {
+            break;
+        } else if (ch == 'T' || ch == 't' || ch == 'D' || ch == 'd') {
+            char file_name[20];
+            strcpy(file_name, (ch == 'T' || ch == 't') ? inst_file : data_file);
+            curs_set(TRUE); 
+            WINDOW *inputwin = newwin(3, 40, (height / 2) + 10, (width / 2) - 20);
+            draw_textbox(inputwin, 1, 1, 38, 1);
+            mvwprintw(inputwin, 0, 2, " Editando %s ", file_name);
+            mvwprintw(inputwin, 1, 1, "digite_");
+            wrefresh(inputwin);
 
-  struct instrucao *regmem =
-      (struct instrucao *)malloc(256 * sizeof(struct instrucao));
+            char new_file_name[20];
+            get_input(inputwin, new_file_name, 19);
 
-  int *registradores = iniciarRegi();
+            if (ch == 'T' || ch == 't') {
+                strcpy(inst_file, new_file_name);
+            } else if (ch == 'D' || ch == 'd') {
+                strcpy(data_file, new_file_name);
+            }
 
-  int *memD = iniciarMemD();
+            delwin(inputwin);
+        }
 
-  struct controle *sinais = iniciarConrole();
-
-  struct regiS *regS1 = iniciarRegiS();
-  struct regiS *regS2 = iniciarRegiS();
-
-  struct variaveis *var = inciarVariaveis();
-
-  int op = 0;
-
-  int *countBeq = (int *)malloc(sizeof(int));
-  *countBeq = 0;
-
-  //////////
-  int n_instrucoes = carregarMemoria("t.txt", regmem);
-
-  wrefresh(startwin);
-  wgetch(startwin);
-
-  delwin(startwin);
-  WINDOW *menuwin = newwin(24, 62, (height / 2) - 12, (width / 2) - 31);
-  WINDOW *regwin = newwin(11, 30, 42, 1);
-  WINDOW *regtwin = newwin(25, 40, 17, 1);
-  WINDOW *memwin = newwin(11, 120, 42, 35);
-
-  do {
-
-    fback(registradores, memD, pc, sinais, var, regS1, pilha, 0);
-
-    if (*(pc) == (5 + n_instrucoes)) {
-      mvwprintw(menuwin, 21, 2, "Todas as instrruções foram execudas");
-      op = 0;
+        delwin(startwin);
+        clear();
+        refresh();
     }
 
-    if (op != 1) {
+    int *pc = (int *)malloc(sizeof(int));
+    *pc = 0;
 
-      exibir_registradores(regwin, registradores);
-      exibir_regt(
-          regtwin,
-          regS1); // como que chama os registradores temporarios aqui? como
-                  // assim? coloca o nome deles e os valores que tem dentro, tem
-                  // uma função antiga que faz isso, verRegT
-      exibir_memoria(memwin, memD);
+    Pilha *pilha = (Pilha *)malloc(sizeof(Pilha));
 
-      op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin,
-                memwin, regmem, n_instrucoes);
+    struct instrucao *regmem = (struct instrucao *)malloc(256 * sizeof(struct instrucao));
 
-      if (op == 3) {
-        break;
-      }
-    }
+    int *registradores = iniciarRegi();
+    //int *memD = iniciarMemD();
+    struct controle *sinais = iniciarConrole();
+    struct regiS *regS1 = iniciarRegiS();
+    struct regiS *regS2 = iniciarRegiS();
+    struct variaveis *var = inciarVariaveis();
 
+    int op = 0;
+    int *countBeq = (int *)malloc(sizeof(int));
+    *countBeq = 0;
+
+    int n_instrucoes = carregarMemoria(inst_file, regmem);
+    carregarDados(data_file, memD);
+
+    curs_set(FALSE); 
+    WINDOW *menuwin = newwin(24, 62, (height / 2) - 12, (width / 2) - 31);
+    WINDOW *regwin = newwin(11, 30, 42, 1);
+    WINDOW *regtwin = newwin(25, 40, 17, 1);
+    WINDOW *memwin = newwin(11, 120, 42, 35);
+    draw_pipeline_art(stdscr);
+    refresh();
+
+
+    do {
+        fback(registradores, memD, pc, sinais, var, regS1, pilha, 0);
+
+        if (*(pc) == (5 + n_instrucoes)) {
+            mvwprintw(menuwin, 21, 2, "Todas as instruções foram execudas");
+            op = 0;
+        }
+
+        if (op != 1) {
+            exibir_registradores(regwin, registradores);
+            exibir_regt(regtwin, regS1);
+            exibir_memoria(memwin, memD);
+
+            op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes);
+
+            if (op == 3) {
+                break;
+            }
+        }
     //////
 
     *pc = var->muxDVI;

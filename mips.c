@@ -506,7 +506,7 @@ void verSinais(struct controle *sinais){
 };
 
 
-void fback(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose){
+void fback(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose, int *countbeq){
   if(chose == 0){
     Nodo *aux = criaNodo(registradores, memD, pc, sinais, var, regTemp);
     push(pilha, aux->estado);
@@ -751,7 +751,7 @@ void exibir_pc(WINDOW *pcwin, int *PC) {
     wrefresh(pcwin);
 }
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes){
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countbeq){
   refresh();
 
   // *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual
@@ -797,25 +797,25 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       break;
     case 'b':
       if (pilha->tam != 0) {
-        fback(registrador, mem, PC, sinais, var, regis, pilha, 1);
+        fback(registrador, mem, PC, sinais, var, regis, pilha, 1, countBeq);
         refresh();
        }
       else {
         printf("Nenhuma instrução para voltar\n");
       }
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
       refresh();
       break;
     case 't':
       salvarDat(mem);
 
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
       refresh();
       break;
     case 'm':
       salvarAsm(regmem, n_instrucoes);
 
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
       refresh();
       break;
 
@@ -827,7 +827,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
     default:
       //printf("Opção inválida\n");
       scanf("%c", &op);
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
       refresh();
       break;
 

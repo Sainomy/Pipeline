@@ -55,9 +55,9 @@ int main() {
         mvwprintw(startwin, 11, 20, "|_____|/ ");
         mvwprintw(startwin, 13, 5, inst_file);
         mvwprintw(startwin, 14, 5, data_file);
-        mvwprintw(startwin, 15, 5, "[T para editar t.txt]");
-        mvwprintw(startwin, 16, 5, "[D para editar dados.dat]");
-        mvwprintw(startwin, 17, 15, "[Pressione ENTER para Iniciar]");
+        mvwprintw(startwin, 15, 5, "[T para editar INSTRUCOES]");
+        mvwprintw(startwin, 16, 5, "[D para editar DADOS]");
+        mvwprintw(startwin, 18, 15, "[Pressione ENTER para Iniciar]");
         wrefresh(startwin);
 
         char ch = wgetch(startwin);
@@ -98,7 +98,6 @@ int main() {
     struct instrucao *regmem = (struct instrucao *)malloc(256 * sizeof(struct instrucao));
 
     int *registradores = iniciarRegi();
-    //int *memD = iniciarMemD();
     struct controle *sinais = iniciarConrole();
     struct regiS *regS1 = iniciarRegiS();
     struct regiS *regS2 = iniciarRegiS();
@@ -114,8 +113,11 @@ int main() {
     curs_set(FALSE); 
     WINDOW *menuwin = newwin(24, 62, (height / 2) - 12, (width / 2) - 31);
     WINDOW *regwin = newwin(11, 30, 42, 1);
-    WINDOW *regtwin = newwin(25, 40, 17, 1);
+    WINDOW *regtwin = newwin(25, 40, 16, 1);
     WINDOW *memwin = newwin(11, 120, 42, 35);
+    WINDOW *sinwin = newwin(12, 30, 28, 125);
+    WINDOW *pcwin = newwin(3, 20, 16, 130);
+    WINDOW *atuwin = newwin(4, 20, 19, 130);
     draw_pipeline_art(stdscr);
     refresh();
 
@@ -124,7 +126,7 @@ int main() {
         fback(registradores, memD, pc, sinais, var, regS1, pilha, 0);
 
         if (*(pc) == (5 + n_instrucoes)) {
-            mvwprintw(menuwin, 21, 2, "Todas as instruções foram execudas");
+            mvwprintw(menuwin, 21, 2, "Todas as instruções foram executadas");
             op = 0;
         }
 
@@ -132,6 +134,9 @@ int main() {
             exibir_registradores(regwin, registradores);
             exibir_regt(regtwin, regS1);
             exibir_memoria(memwin, memD);
+            exibir_sinais(sinwin, sinais);
+            exibir_pc(pcwin, *pc);
+            exibir_atual(atuwin, memD, n_instrucoes);
 
             op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes);
 

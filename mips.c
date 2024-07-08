@@ -22,45 +22,45 @@ void memDados(int *memD, int endereco, int dado, int EscMem, int *saida){
 }
 
 void ula(int valor1, int valor2, int *saida, int *flag, int ULAop){
-	(*flag) = 0;
-	switch(ULAop){
-	  
-	  case 0:
-	  if(valor1 + valor2 > 127 || valor1 + valor2 < -128){
-		*flag = 1;
-	  }
-	  *saida = valor1 + valor2;
-	  break;
-	  
-	  case 2:
-	  if(valor1 - valor2 > 127 || valor1 - valor2 < -128){
-		*flag = 1;
-	  }
-	  *saida = valor1 - valor2;
-	  break;
-	  
-	  case 4:
-	  if((valor1 & valor2) > 127 || (valor1 & valor2) < -128){
-	   *flag = 1;
-	  }
-	  *saida = valor1 & valor2;
-	  break;
-	  
-	  case 5:
-	  if((valor1 | valor2) > 127 || (valor1 | valor2) < -128){
-		*flag = 1;
-	  }
-	  *saida = valor1 | valor2;
-	  break;
+  (*flag) = 0;
+  switch(ULAop){
 
-	  case 1:
-	  if(valor1 == valor2){
-		*flag = 1;
-		*saida = 0;
-	  }
-	  break;
-	  
-	  }
+    case 0:
+    if(valor1 + valor2 > 127 || valor1 + valor2 < -128){
+    *flag = 1;
+    }
+    *saida = valor1 + valor2;
+    break;
+
+    case 2:
+    if(valor1 - valor2 > 127 || valor1 - valor2 < -128){
+    *flag = 1;
+    }
+    *saida = valor1 - valor2;
+    break;
+
+    case 4:
+    if((valor1 & valor2) > 127 || (valor1 & valor2) < -128){
+     *flag = 1;
+    }
+    *saida = valor1 & valor2;
+    break;
+
+    case 5:
+    if((valor1 | valor2) > 127 || (valor1 | valor2) < -128){
+    *flag = 1;
+    }
+    *saida = valor1 | valor2;
+    break;
+
+    case 1:
+    if(valor1 == valor2){
+    *flag = 1;
+    *saida = 0;
+    }
+    break;
+
+    }
 }
 
 void BancoRegistradores(int *registradores, int ReadEnd1, int ReadEnd2, int WriteEnd, int dado, int *saida1, int *saida2, int EscReg){
@@ -85,7 +85,7 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
       sinais->EscReg = 1;
       sinais->MemParaReg = 1;
       break;
-    
+
      case 1:
       sinais->RegDst = 1;
       sinais->ULAOp = bits->inst->funct;
@@ -96,8 +96,8 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
       sinais->EscReg = 1;
       sinais->MemParaReg = 1;
       break;
-    
-    
+
+
     case 2:
       sinais->RegDst = 0;
       sinais->ULAOp = 0;
@@ -108,7 +108,7 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
       sinais->EscReg = 0;
       sinais->MemParaReg = 0;
       break;
-    
+
     case 4:
       sinais->RegDst = 0;
       sinais->ULAOp = 0;
@@ -119,7 +119,7 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
       sinais->EscReg = 1;
       sinais->MemParaReg = 1;
       break;
-    
+
     case 8:
       sinais->RegDst = 0;
       sinais->ULAOp = 1;
@@ -130,7 +130,7 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
       sinais->EscReg = 0;
       sinais->MemParaReg = 0;
       break;
-    
+
     case 11:
       sinais->RegDst = 0;
       sinais->ULAOp = 0;
@@ -141,7 +141,7 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
       sinais->EscReg = 1;
       sinais->MemParaReg = 0;
       break;
-    
+
     case 15:
       sinais->RegDst = 0;
       sinais->ULAOp = 0;
@@ -153,13 +153,13 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
       sinais->MemParaReg = 1;
       break;
   }
-	return sinais;
+  return sinais;
 }
 
 //funcoes de apoio
 
 int carregarMemoria(char *nomeArquivo, struct instrucao *mem){
-  
+
   int i=0;
   FILE *arquivo;
   arquivo = fopen(nomeArquivo, "r");
@@ -196,7 +196,7 @@ int bi_dec(char *bin){
 }
 
 void decodificarOpcode(struct instrucao *mem, int n_instrucoes){
-  
+
   char b11_9[4];
   char b8_6[4];
   char b5_3[4];
@@ -204,7 +204,7 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes){
   char b0_6[8];
   char op[5];
   char funct[4];
-  
+
   for(int i=0;i<3;i++){
     b11_9[i]=mem[n_instrucoes].instrucao[i+4];
     b8_6[i]=mem[n_instrucoes].instrucao[i+7];
@@ -213,14 +213,14 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes){
     op[i]=mem[n_instrucoes].instrucao[i];
   }
   op[3]=mem[n_instrucoes].instrucao[3];
-  
+
   for(int i=0;i<7;i++){
      b5_0[i]=mem[n_instrucoes].instrucao[i+10];
      b0_6[i]=mem[n_instrucoes].instrucao[i+9];
   }
   b0_6[6]=mem[n_instrucoes].instrucao[15];
-  
-  
+
+
   b11_9[3] = '\0';
   b8_6[3] = '\0';
   b5_3[3] = '\0';
@@ -228,7 +228,7 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes){
   b0_6[7] = '\0';
   op[4] = '\0';
   funct[3] = '\0';
-  
+
   mem[n_instrucoes].b0_6=bi_dec(b0_6);
   mem[n_instrucoes].b5_0=bi_dec(b5_0);
   mem[n_instrucoes].b8_6=bi_dec(b8_6);
@@ -236,7 +236,7 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes){
   mem[n_instrucoes].b11_9=bi_dec(b11_9);
   mem[n_instrucoes].opcode=bi_dec(op);
   mem[n_instrucoes].funct=bi_dec(funct);
-  
+
 }
 
 struct controle * iniciarConrole(){
@@ -269,7 +269,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
   if(mem->d_i==1){
     traduzirInstrucao(mem, PC);
   }
-  
+
   printf("\n");
   printf("\t\t (r) (RUN) Executar todo o arquivo    \n");
   printf("\t\t (e) (STEP) Executar uma linha        \n");
@@ -293,7 +293,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
     case 'e':
       return 0;
       break;
-    
+
     case 'b':
     if (!isEmpty(pilha)) {
       fback(sinais, mem, PC, regitemp, registrador, pilha, 1);
@@ -303,21 +303,21 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
     }
       return menu(sinais, mem, PC, regitemp, registrador, pilha);
       break;
-      
+
     case 'v':
-	  verEstado(regis);
+    verEstado(regis);
       return menu(sinais, PC, regis, registrador, mem, var);
       break;
-    
-    
+
+
     case 'a':
     verInstrucaoAtual(mem, *PC);
     //  verinstrucoes(mem,count,0, n_instrucoes);
       return menu(sinais, mem, PC, regitemp, registrador, pilha);
       break;
-     
-      
-      
+
+
+
     case 'i':
       verReg(registrador);
       return menu(sinais, PC, regis, registrador, mem, var);
@@ -326,7 +326,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       vermemoria(mem);
       return menu(sinais, PC, regis, registrador, mem, var);
       break;
-   
+
     case 'c':
       verRegT(regis);
       return menu(sinais, PC, regis, registrador, mem, var);
@@ -339,7 +339,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       verSinais(sinais);
       return menu(sinais, PC, regis, registrador, mem, var);
       break;
-   
+
     case 'x':
       printf("Programa finalizado\n");
       return 3;
@@ -348,7 +348,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       printf("Opção inválida\n");
       return menu(sinais, PC, regis, registrador, mem, var);
       break;
-    
+
   }
   return 3;
 }*/
@@ -380,12 +380,12 @@ struct regiS * iniciarRegiS(){
   aux->di_ex = (struct regiDI_EX *)malloc(sizeof(struct regiDI_EX));
   aux->ex_mem = (struct regiEX_MEM *)malloc(sizeof(struct regiEX_MEM));
   aux->mem_er = (struct regiMEM_ER *)malloc(sizeof(struct regiMEM_ER));
-  
+
   aux->bi_di->inst = (struct instrucao *)malloc(sizeof(struct instrucao));
   aux->di_ex->inst = (struct instrucao *)malloc(sizeof(struct instrucao));
   aux->ex_mem->inst = (struct instrucao *)malloc(sizeof(struct instrucao));
   aux->mem_er->inst = (struct instrucao *)malloc(sizeof(struct instrucao));
-  
+
   aux->di_ex->sinais = (struct controle *)malloc(sizeof(struct controle));
   aux->ex_mem->sinais = (struct controle *)malloc(sizeof(struct controle));
   aux->mem_er->sinais = (struct controle *)malloc(sizeof(struct controle));
@@ -394,7 +394,7 @@ struct regiS * iniciarRegiS(){
   aux->di_ex->var = inciarVariaveis();
   aux->ex_mem->var = inciarVariaveis();
   aux->mem_er->var = inciarVariaveis();
-  
+
   return aux;
 };
 
@@ -418,49 +418,49 @@ struct variaveis * inciarVariaveis(){
       aux->muxMemReg = 0;
       aux->muxULA = 0;
       return aux;
-  
+
 };
 
 struct regiS * copy(struct regiS *regS2){
-	
-	struct regiS *aux = iniciarRegiS(); 
 
-	*aux->bi_di->var =  *regS2->bi_di->var;
-	*aux->bi_di->inst =  *regS2->bi_di->inst;
-	aux->bi_di->pc =  regS2->bi_di->pc;
-	  
-	aux->di_ex->A = regS2->di_ex->A;
-	aux->di_ex->B = regS2->di_ex->B;
-	aux->di_ex->pc = regS2->di_ex->pc;
-	*aux->di_ex->inst = *regS2->di_ex->inst;
-	*aux->di_ex->sinais = *regS2->di_ex->sinais;
-	*aux->di_ex->var = *regS2->di_ex->var;
-	
-	*aux->ex_mem->inst = *regS2->ex_mem->inst;
-	aux->ex_mem->saidaULA = regS2->ex_mem->saidaULA;
-	aux->ex_mem->B = regS2->ex_mem->B;
-	aux->ex_mem->muxRegDst = regS2->ex_mem->muxRegDst;
-	*aux->ex_mem->sinais = *regS2->ex_mem->sinais;
-	*aux->ex_mem->var = *regS2->ex_mem->var;
-	aux->ex_mem->pc = regS2->ex_mem->pc;
-	aux->ex_mem->flag = regS2->ex_mem->flag;
-	
-	aux->mem_er->pc = regS2->mem_er->pc;
-	aux->mem_er->muxRegDst = regS2->mem_er->muxRegDst;
-	aux->mem_er->saidaULA = regS2->mem_er->saidaULA;
-	aux->mem_er->saidaMem = regS2->mem_er->saidaMem;
-	*aux->mem_er->inst = *regS2->mem_er->inst;
-	*aux->mem_er->sinais = *regS2->mem_er->sinais;
-	*aux->mem_er->var = *regS2->mem_er->var;
-	
-	return aux;
+  struct regiS *aux = iniciarRegiS(); 
+
+  *aux->bi_di->var =  *regS2->bi_di->var;
+  *aux->bi_di->inst =  *regS2->bi_di->inst;
+  aux->bi_di->pc =  regS2->bi_di->pc;
+
+  aux->di_ex->A = regS2->di_ex->A;
+  aux->di_ex->B = regS2->di_ex->B;
+  aux->di_ex->pc = regS2->di_ex->pc;
+  *aux->di_ex->inst = *regS2->di_ex->inst;
+  *aux->di_ex->sinais = *regS2->di_ex->sinais;
+  *aux->di_ex->var = *regS2->di_ex->var;
+
+  *aux->ex_mem->inst = *regS2->ex_mem->inst;
+  aux->ex_mem->saidaULA = regS2->ex_mem->saidaULA;
+  aux->ex_mem->B = regS2->ex_mem->B;
+  aux->ex_mem->muxRegDst = regS2->ex_mem->muxRegDst;
+  *aux->ex_mem->sinais = *regS2->ex_mem->sinais;
+  *aux->ex_mem->var = *regS2->ex_mem->var;
+  aux->ex_mem->pc = regS2->ex_mem->pc;
+  aux->ex_mem->flag = regS2->ex_mem->flag;
+
+  aux->mem_er->pc = regS2->mem_er->pc;
+  aux->mem_er->muxRegDst = regS2->mem_er->muxRegDst;
+  aux->mem_er->saidaULA = regS2->mem_er->saidaULA;
+  aux->mem_er->saidaMem = regS2->mem_er->saidaMem;
+  *aux->mem_er->inst = *regS2->mem_er->inst;
+  *aux->mem_er->sinais = *regS2->mem_er->sinais;
+  *aux->mem_er->var = *regS2->mem_er->var;
+
+  return aux;
 };
 
 void verEstado(struct regiS  *regis){
-		printf("\nBI_DI [%s]", regis->bi_di->inst->instrucao);
-		printf("\nDI EX [%s]", regis->di_ex->inst->instrucao);
-		printf("\nEX_MEM [%s]", regis->ex_mem->inst->instrucao);
-		printf("\nMEM_ER [%s]", regis->mem_er->inst->instrucao);
+    printf("\nBI_DI [%s]", regis->bi_di->inst->instrucao);
+    printf("\nDI EX [%s]", regis->di_ex->inst->instrucao);
+    printf("\nEX_MEM [%s]", regis->ex_mem->inst->instrucao);
+    printf("\nMEM_ER [%s]", regis->mem_er->inst->instrucao);
 };
 
 void verReg(int *registrador){
@@ -470,26 +470,26 @@ void verReg(int *registrador){
 }
 
 void vermemoria(int *mem){
-	for(int i=0;i<256;i++){
-		printf("\n[%i]: %i \n",i, mem[i]);
-	  }	
+  for(int i=0;i<256;i++){
+    printf("\n[%i]: %i \n",i, mem[i]);
+    }	
 };
 
 void verRegT(struct regiS  *regisT){
-	
-	printf("\n\nBI_DI \nInstrução: [%s]\nPC: %i", regisT->bi_di->inst->instrucao, regisT->bi_di->pc);
-	printf("\n\nDI EX \nInstrução: [%s]\nPC: %i\nA: %i\nB: %i", regisT->di_ex->inst->instrucao, regisT->di_ex->pc, regisT->di_ex->A, regisT->di_ex->B);
-	printf("\n\nEX_MEM\nInstrução: [%s]\nPC: %i\nSa´da ULA: %i\nB: %i\nRegistrador destino: %i", regisT->ex_mem->inst->instrucao, regisT->ex_mem->pc, regisT->ex_mem->saidaULA, regisT->ex_mem->B, regisT->ex_mem->muxRegDst);
-	printf("\n\nMEM_ER\nInstrução: [%s]\nPC: %i\nRegistrador destino: %i", regisT->mem_er->inst->instrucao, regisT->mem_er->pc, regisT->mem_er->muxRegDst);
-	
+
+  printf("\n\nBI_DI \nInstrução: [%s]\nPC: %i", regisT->bi_di->inst->instrucao, regisT->bi_di->pc);
+  printf("\n\nDI EX \nInstrução: [%s]\nPC: %i\nA: %i\nB: %i", regisT->di_ex->inst->instrucao, regisT->di_ex->pc, regisT->di_ex->A, regisT->di_ex->B);
+  printf("\n\nEX_MEM\nInstrução: [%s]\nPC: %i\nSa´da ULA: %i\nB: %i\nRegistrador destino: %i", regisT->ex_mem->inst->instrucao, regisT->ex_mem->pc, regisT->ex_mem->saidaULA, regisT->ex_mem->B, regisT->ex_mem->muxRegDst);
+  printf("\n\nMEM_ER\nInstrução: [%s]\nPC: %i\nRegistrador destino: %i", regisT->mem_er->inst->instrucao, regisT->mem_er->pc, regisT->mem_er->muxRegDst);
+
 };
 
 void verVariaveis(struct variaveis *var){
-	printf("\nFlag: %i, \nmuxDVC: %i, \nmuxDVI: %i, \nmuxloaD: %i, \nmuxRegDst: %i, \nmuxMemReg: %i, \nmuxULA: %i, \nsaida1: %i, \nsaida2: %i, \nULA: %i, \nsaidaMem: %i", *var->flag, var->muxDVC, var->muxDVI, var->muxloaD, var->muxRegDst, var->muxMemReg, var->muxULA, *var->saida1, *var->saida2, *var->ULA, *var->saidaMem); 
+  printf("\nFlag: %i, \nmuxDVC: %i, \nmuxDVI: %i, \nmuxloaD: %i, \nmuxRegDst: %i, \nmuxMemReg: %i, \nmuxULA: %i, \nsaida1: %i, \nsaida2: %i, \nULA: %i, \nsaidaMem: %i", *var->flag, var->muxDVC, var->muxDVI, var->muxloaD, var->muxRegDst, var->muxMemReg, var->muxULA, *var->saida1, *var->saida2, *var->ULA, *var->saidaMem); 
 };
 
 void verSinais(struct controle *sinais){
-	printf("\nmuxEscMem: %i, \nRegDst: %i, \nEscReg: %i, \nMemParaReg: %i, \nULAFonte: %i, \nULAOp: %i, \nDVI: %i, \nDVC: %i",sinais->EscMem, sinais->RegDst, sinais->EscReg, sinais->MemParaReg, sinais->ULAFonte, sinais->ULAOp, sinais->DVI, sinais->DVC);
+  printf("\nmuxEscMem: %i, \nRegDst: %i, \nEscReg: %i, \nMemParaReg: %i, \nULAFonte: %i, \nULAOp: %i, \nDVI: %i, \nDVC: %i",sinais->EscMem, sinais->RegDst, sinais->EscReg, sinais->MemParaReg, sinais->ULAFonte, sinais->ULAOp, sinais->DVI, sinais->DVC);
 };
 
 
@@ -507,7 +507,7 @@ void fback(int *registradores, int *memD, int *pc, struct controle *sinais, stru
       memD[i] = pilha->top->estado->memD[i];
     }
     *sinais = pilha->top->estado->sinais;
-   
+
   *var->flag = *pilha->top->estado->var.flag;
   var->muxDVC = pilha->top->estado->var.muxDVC;
   var->muxDVI = pilha->top->estado->var.muxDVI;
@@ -519,16 +519,16 @@ void fback(int *registradores, int *memD, int *pc, struct controle *sinais, stru
   *var->saida2 = *pilha->top->estado->var.saida2;
   *var->ULA = *pilha->top->estado->var.ULA;
   *var->saidaMem = *pilha->top->estado->var.saidaMem;
-  
+
   regTemp->bi_di->pc = pilha->top->estado->regTemp->bi_di->pc;
   *regTemp->bi_di->inst = *pilha->top->estado->regTemp->bi_di->inst;
-  
+
   regTemp->di_ex->A = pilha->top->estado->regTemp->di_ex->A;
   regTemp->di_ex->B = pilha->top->estado->regTemp->di_ex->B;
   regTemp->di_ex->pc = pilha->top->estado->regTemp->di_ex->pc;
   *regTemp->di_ex->sinais = *pilha->top->estado->regTemp->di_ex->sinais;
   *regTemp->di_ex->inst = *pilha->top->estado->regTemp->di_ex->inst;
-     
+
   regTemp->ex_mem->pc = pilha->top->estado->regTemp->ex_mem->pc;
   regTemp->ex_mem->saidaULA = pilha->top->estado->regTemp->ex_mem->saidaULA;
   regTemp->ex_mem->B = pilha->top->estado->regTemp->ex_mem->B;
@@ -536,15 +536,15 @@ void fback(int *registradores, int *memD, int *pc, struct controle *sinais, stru
   regTemp->ex_mem->flag = pilha->top->estado->regTemp->ex_mem->flag;
   *regTemp->ex_mem->sinais = *pilha->top->estado->regTemp->ex_mem->sinais;
   *regTemp->ex_mem->inst = *pilha->top->estado->regTemp->ex_mem->inst;
-  
-  
+
+
   regTemp->mem_er->pc = pilha->top->estado->regTemp->mem_er->pc;
   regTemp->mem_er->muxRegDst = pilha->top->estado->regTemp->mem_er->muxRegDst;
   regTemp->mem_er->saidaULA = pilha->top->estado->regTemp->mem_er->saidaULA;
   regTemp->mem_er->saidaMem = pilha->top->estado->regTemp->mem_er->saidaMem;
   *regTemp->mem_er->inst = *pilha->top->estado->regTemp->mem_er->inst;
   *regTemp->mem_er->sinais = *pilha->top->estado->regTemp->mem_er->sinais;
-    
+
    pop(pilha);
   }
 }
@@ -576,18 +576,18 @@ Nodo *criaNodo(int *registradores, int *memD, int *pc, struct controle *sinais, 
 
 back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp){
   back *aux=iniciarBack();
-  
+
   aux->pc = *pc;
-  
+
   for(int i = 0; i<8; i++){
     aux->registradores[i] = registradores[i];
   }
   for(int i = 0; i<256; i++){
     aux->memD[i] = memD[i];
   }
-  
+
   aux->sinais = *sinais;
-  
+
   *aux->var.flag = *var->flag;
   aux->var.muxDVC = var->muxDVC;
   aux->var.muxDVI = var->muxDVI;
@@ -599,16 +599,16 @@ back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, st
   *aux->var.saida2 = *var->saida2;
   *aux->var.ULA = *var->ULA;
   *aux->var.saidaMem = *var->saidaMem;
-  
+
   aux->regTemp->bi_di->pc = regTemp->bi_di->pc;
   *aux->regTemp->bi_di->inst = *regTemp->bi_di->inst;
-  
+
   aux->regTemp->di_ex->A = regTemp->di_ex->A;
   aux->regTemp->di_ex->B = regTemp->di_ex->B;
   aux->regTemp->di_ex->pc = regTemp->di_ex->pc;
   *aux->regTemp->di_ex->sinais = *regTemp->di_ex->sinais;
   *aux->regTemp->di_ex->inst = *regTemp->di_ex->inst;
-     
+
   aux->regTemp->ex_mem->pc = regTemp->ex_mem->pc;
   aux->regTemp->ex_mem->saidaULA = regTemp->ex_mem->saidaULA;
   aux->regTemp->ex_mem->B = regTemp->ex_mem->B;
@@ -616,16 +616,16 @@ back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, st
   aux->regTemp->ex_mem->flag = regTemp->ex_mem->flag;
   *aux->regTemp->ex_mem->sinais= *regTemp->ex_mem->sinais;
   *aux->regTemp->ex_mem->inst = *regTemp->ex_mem->inst;
-  
-  
+
+
   aux->regTemp->mem_er->pc = regTemp->mem_er->pc;
   aux->regTemp->mem_er->muxRegDst = regTemp->mem_er->muxRegDst;
   aux->regTemp->mem_er->saidaULA = regTemp->mem_er->saidaULA;
   aux->regTemp->mem_er->saidaMem = regTemp->mem_er->saidaMem;
   *aux->regTemp->mem_er->inst = *regTemp->mem_er->inst;
   *aux->regTemp->mem_er->sinais = *regTemp->mem_er->sinais;
-  
-  
+
+
   return aux;
 }
 
@@ -638,10 +638,10 @@ back * iniciarBack(){
     aux->var.saida1 = (int *)malloc(sizeof(int));
     aux->var.saida2 = (int *)malloc(sizeof(int));
     aux->var.ULA = (int *)malloc(sizeof(int));
-	aux->var.saidaMem = (int *)malloc(sizeof(int));
-	aux->regTemp = iniciarRegiS();
-	
-	
+  aux->var.saidaMem = (int *)malloc(sizeof(int));
+  aux->regTemp = iniciarRegiS();
+
+
    return aux;
 }
 
@@ -649,7 +649,7 @@ back * iniciarBack(){
 void exibir_registradores(WINDOW *regwin, int *registrador) {
     box(regwin, 0, 0);
     mvwprintw(regwin, 1, 1, "Banco de Registradores");
-    
+
     for (int i = 0; i < 8; i++) {
         mvwprintw(regwin, 2 + i, 1, "Registrador %d: %d", i, registrador[i]);
     }
@@ -659,7 +659,7 @@ void exibir_registradores(WINDOW *regwin, int *registrador) {
 void exibir_memoria(WINDOW *memwin, int *mem) {
    box(memwin, 0, 0);
     mvwprintw(memwin, 1, 1, "Memória de Dados");
-    
+
     for (int i = 0; i < 256; i++) {
         mvwprintw(memwin, (i / 38) + 2, (i % 40) * 7 + 1, " %d", mem[i]);
          //mvwprintw(memwin, 2 + i, 1, "%d: %d", i, mem[i]);
@@ -700,12 +700,12 @@ void exibir_regt(WINDOW *regtwin, struct regiS *regisT) {
     wrefresh(regtwin);
 }
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin){
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes){
   refresh();
 
-  //*PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual
- 
-  	box(menuwin, 0, 0);
+  // *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual
+
+    box(menuwin, 0, 0);
     keypad(menuwin, TRUE); // Habilita captura de teclas especiais
     wrefresh(menuwin);
     // Desenhando o cabeçalho
@@ -722,7 +722,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
    // mvwprintw(menuwin, 14, 2, "\t(i) Ver Registradores");
    // mvwprintw(menuwin, 15, 2, "\t(d) Ver Memória de Dados");
    // mvwprintw(menuwin, 16, 2, "\t(i) Ver Todas as Instruções");
-  //. mvwprintw(menuwin, 17, 2, "\t(s) Ver Sinais");
+   // mvwprintw(menuwin, 17, 2, "\t(s) Ver Sinais");
    // mvwprintw(menuwin, 18, 2, "\t(t) Ver Variáveis");
    // mvwprintw(menuwin, 19, 2, "\t(c) Ver Registradores Temporários");
     mvwprintw(menuwin, 12, 2, "\t(m) Salvar .asm");
@@ -732,9 +732,9 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
     //mvwprintw(menuwin, 22, 2, "\tSelecione: p: ");
     wrefresh(menuwin);
     char op =  getch();
-    
-	 if(op == '\n'){
-	  op = 'e';
+
+   if(op == '\n'){
+    op = 'e';
     wrefresh(memwin);
   }
   switch(op){
@@ -752,73 +752,73 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       else {
         printf("Nenhuma instrução para voltar\n");
       }
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes);
       refresh();
       break;
     case 't':
-      //salvarDat();
-      
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin);
+      salvarDat(mem);
+
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes);
       refresh();
       break;
-    case 's':
-      //salvarAsm();
-      
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin);
+    case 'm':
+      salvarAsm(regmem, n_instrucoes);
+
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes);
       refresh();
       break;
-   
+
     case 'x':
       printf("Programa finalizado\n");
       return 3;
       break;
-      
+
     default:
       //printf("Opção inválida\n");
       scanf("%c", &op);
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes);
       refresh();
       break;
-    
+
   }
   return 3;
 }
 
 void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq){
-	if(inst.opcode == 8 && flag == 1 && *countBeq == 0){
-		*sinais = zerarSinais();
-		*regTemp->di_ex->sinais = zerarSinais();
-		(*countBeq)++;
-		return;
-	}
-	if(*countBeq == 1){
-	*sinais = zerarSinais();
-	*regTemp->di_ex->sinais = zerarSinais();
-	*regTemp->ex_mem->sinais = zerarSinais();
-	(*countBeq)++;
-	return;
-	}
-	if(*countBeq == 2){
-	//*sinais = zerarSinais();
-	*regTemp->di_ex->sinais = zerarSinais();
-	*regTemp->ex_mem->sinais = zerarSinais();
-	*regTemp->mem_er->sinais = zerarSinais();
-	(*countBeq)++;
-	return;
-	}
-	if(*countBeq == 3){
-		*countBeq = 0;
-		return;
-	}
-	if(*countBeq >= 1){
-	(*countBeq)++;
-	return;
-	}
+  if(inst.opcode == 8 && flag == 1 && *countBeq == 0){
+    *sinais = zerarSinais();
+    *regTemp->di_ex->sinais = zerarSinais();
+    (*countBeq)++;
+    return;
+  }
+  if(*countBeq == 1){
+  *sinais = zerarSinais();
+  *regTemp->di_ex->sinais = zerarSinais();
+  *regTemp->ex_mem->sinais = zerarSinais();
+  (*countBeq)++;
+  return;
+  }
+  if(*countBeq == 2){
+  // *sinais = zerarSinais();
+  *regTemp->di_ex->sinais = zerarSinais();
+  *regTemp->ex_mem->sinais = zerarSinais();
+  *regTemp->mem_er->sinais = zerarSinais();
+  (*countBeq)++;
+  return;
+  }
+  if(*countBeq == 3){
+    *countBeq = 0;
+    return;
+  }
+  if(*countBeq >= 1){
+  (*countBeq)++;
+  return;
+  }
 }
 
 struct controle zerarSinais(){
-	  struct controle sinais;
-	  sinais.RegDst = 0;
+    struct controle sinais;
+    sinais.RegDst = 0;
       sinais.ULAOp = 0;
       sinais.ULAFonte = 0;
       sinais.DVC = 0;
@@ -827,4 +827,79 @@ struct controle zerarSinais(){
       sinais.EscReg = 0;
       sinais.MemParaReg = 0;
       return sinais;
+}
+
+void salvarAsm(struct instrucao *mem, int n_instrucoes) {
+  FILE *arquivoSaida;
+  arquivoSaida = fopen("instrucoes.asm", "w");
+
+  if (arquivoSaida == NULL) {
+    printf("Erro ao abrir o arquivo.\n");
+    return;
+  }
+
+  for (int i = 0; i < n_instrucoes; i++) {
+      switch (mem[i].opcode) {
+      case 0:
+        switch (mem[i].funct) {
+        case 0:
+          fprintf(arquivoSaida, "add $%d, $%d, $%d\n", mem[i].b5_3,
+                  mem[i].b11_9, mem[i].b8_6);
+          break;
+        case 2:
+          fprintf(arquivoSaida, "sub $%d, $%d, $%d\n", mem[i].b5_3,
+                  mem[i].b11_9, mem[i].b8_6);
+          break;
+        case 5:
+          fprintf(arquivoSaida, "or $%d, $%d, $%d\n", mem[i].b5_3,
+                  mem[i].b11_9, mem[i].b8_6);
+          break;
+        case 4:
+          fprintf(arquivoSaida, "and $%d, $%d, $%d\n", mem[i].b5_3,
+                  mem[i].b11_9, mem[i].b8_6);
+          break;
+        default:
+          fprintf(arquivoSaida, "Instrução inválida");
+          break;
+        }
+        break;
+      case 4:
+        fprintf(arquivoSaida, "addi $%d, $%d, %d\n", mem[i].b8_6,
+                mem[i].b11_9, mem[i].b5_0);
+        break;
+      case 11:
+        fprintf(arquivoSaida, "lw $%d, %d($%d)\n", mem[i].b8_6,
+                mem[i].b5_0, mem[i].b11_9);
+        break;
+      case 15:
+        fprintf(arquivoSaida, "sw $%d, %d($%d)\n", mem[i].b8_6,
+                mem[i].b5_0, mem[i].b11_9);
+        break;
+      case 8:
+        fprintf(arquivoSaida, "beq $%d, $%d, %d\n", mem[i].b8_6,
+                mem[i].b11_9, mem[i].b5_0);
+        break;
+      case 2:
+        fprintf(arquivoSaida, "j %d\n", mem[i].b0_6);
+        break;
+      default:
+        break;
+    }
+  }
+  fclose(arquivoSaida);
+  printf("Arquivo .asm salvo com sucesso.\n");
+}
+
+void salvarDat(int *memD){
+  FILE *arquivo;
+  arquivo = fopen("dados.txt", "w");
+  if(arquivo == NULL){
+    printf("Erro ao abrir o arquivo.\n");
+    return;
+  }
+  for(int i = 0; i < 256; i++){
+    fprintf(arquivo, "%d: %d\n",i, memD[i]);
+  }
+  fclose(arquivo);
+  printf("\nDados salvos com sucesso.\n");
 }

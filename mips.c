@@ -836,7 +836,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
 }
 
 void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq){
-  if(inst.opcode == 8 && flag == 1 && *countBeq == 0){
+  if((inst.opcode == 8 && flag == 1 && *countBeq == 0) || (inst.opcode == 2 *countBeq == 0)){
     *sinais = zerarSinais();
     *regTemp->di_ex->sinais = zerarSinais();
     (*countBeq)++;
@@ -860,10 +860,6 @@ void HazardControle(struct regiS *regTemp, struct instrucao inst, struct control
   if(*countBeq == 3){
     *countBeq = 0;
     return;
-  }
-  if(*countBeq >= 1){
-  (*countBeq)++;
-  return;
   }
 }
 

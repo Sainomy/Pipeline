@@ -123,7 +123,7 @@ int main() {
 
 
     do {
-        fback(registradores, memD, pc, sinais, var, regS1, pilha, 0);
+        fback(registradores, memD, pc, sinais, var, regS1, pilha, 0, countBeq);
 
         if (*(pc) == (5 + n_instrucoes)) {
             mvwprintw(menuwin, 21, 2, "Todas as instruções foram executadas");
@@ -138,7 +138,7 @@ int main() {
             exibir_pc(pcwin, *pc);
             exibir_atual(atuwin, memD, n_instrucoes);
 
-            op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes);
+            op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
 
             if (op == 3) {
                 break;

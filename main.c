@@ -199,16 +199,16 @@ int main() {
              regS1->ex_mem->sinais->EscMem, var->saidaMem);
 
     if ((regS1->ex_mem->flag + regS1->ex_mem->sinais->DVC) == 2) {
-      var->muxDVC = 1;
+      regS1->ex_mem->sinais->muxDVC = 1;
     }
-    if (var->muxDVC == 1) {
+    if (regS1->ex_mem->sinais->muxDVC == 1) {
       var->muxDVC = regS1->ex_mem->pc + 1 + regS1->ex_mem->inst->b5_0;
     } else {
       var->muxDVC = *pc + 1;
     }
 
     if (regS1->ex_mem->sinais->DVI == 0) {
-      var->muxDVI = var->muxDVC;
+      var->muxDVI = regS1->ex_mem->sinais->muxDVC;
     } else {
       var->muxDVI = regS1->ex_mem->pc + 1 + regS1->ex_mem->inst->b0_6;
     }

@@ -55,6 +55,7 @@ struct regiEX_MEM{
   int flag;
   struct controle *sinais;
   struct variaveis *var;
+  int DVC;
 
 };
 
@@ -140,7 +141,7 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes);
 
 struct controle * iniciarConrole();
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq, WINDOW *regwin, WINDOW *regtwin, WINDOW *sinwin, WINDOW *pcwin, WINDOW *atuwin);
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq);
 
 int * iniciarRegi();
 int * iniciarMemD();
@@ -158,9 +159,9 @@ back * iniciarBack();
 
 void push(Pilha* stack, back *estado);
 void pop(Pilha* pilha);
-Nodo *criaNodo(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp);
+Nodo *criaNodo(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, int *countBeq);
 void fback(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose, int *countBeq);
-back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp);
+back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, int *countBeq);
 int isEmpty(Pilha* pilha);
 back * iniciarBack();
 
@@ -170,7 +171,7 @@ void exibir_regt(WINDOW *regtwin, struct regiS  *regisT);
 void exibir_sinais(WINDOW *sinwin, struct controle *sinais);
 
 void exibir_pc(WINDOW *pcwin, int *PC);
-void exibir_atual(WINDOW *atuwin, struct instrucao *mem, int n_instrucoes);
+void exibir_atual(WINDOW *atuwin, int*mem, int n_instrucoes);
 
 
 void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq);
@@ -178,3 +179,7 @@ struct controle zerarSinais();
 
 void salvarAsm(struct instrucao *regmem, int n_instrucoes);
 void salvarDat(int *memD);
+
+void draw_textbox(WINDOW *win, int start_y, int start_x, int width, int height);
+void get_input(WINDOW *win, char *input, int len);
+void draw_pipeline_art(WINDOW *win);

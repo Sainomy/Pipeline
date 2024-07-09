@@ -508,10 +508,12 @@ void verSinais(struct controle *sinais){
 
 void fback(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose, int *countbeq){
   if(chose == 0){
-    Nodo *aux = criaNodo(registradores, memD, pc, sinais, var, regTemp);
+    Nodo *aux = criaNodo(registradores, memD, pc, sinais, var, regTemp, countbeq);
     push(pilha, aux->estado);
     free(aux);
-  } else {
+  } 
+  else {
+	*countbeq = pilha->top->estado->countdesvio;
     *pc = pilha->top->estado->pc;
     for(int i = 0; i<8; i++){
       registradores[i] = pilha->top->estado->registradores[i];
@@ -542,6 +544,7 @@ void fback(int *registradores, int *memD, int *pc, struct controle *sinais, stru
   *regTemp->di_ex->sinais = *pilha->top->estado->regTemp->di_ex->sinais;
   *regTemp->di_ex->inst = *pilha->top->estado->regTemp->di_ex->inst;
 
+  regTemp->ex_mem->DVC = pilha->top->estado->regTemp->ex_mem->DVC;
   regTemp->ex_mem->pc = pilha->top->estado->regTemp->ex_mem->pc;
   regTemp->ex_mem->saidaULA = pilha->top->estado->regTemp->ex_mem->saidaULA;
   regTemp->ex_mem->B = pilha->top->estado->regTemp->ex_mem->B;
@@ -579,17 +582,18 @@ void pop(Pilha *pilha) {
   pilha->tam--;
 }
 
-Nodo *criaNodo(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp){
+Nodo *criaNodo(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, int *countBeq){
 
   Nodo *aux=(Nodo *)malloc(sizeof(Nodo));
-  aux->estado = printn(registradores, memD, pc, sinais, var, regTemp);
+  aux->estado = printn(registradores, memD, pc, sinais, var, regTemp, countBeq);
 
   return aux;
 }
 
-back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp){
+back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, int *countBeq){
   back *aux=iniciarBack();
 
+  aux->countdesvio = *countBeq;
   aux->pc = *pc;
 
   for(int i = 0; i<8; i++){
@@ -623,6 +627,7 @@ back *printn(int *registradores, int *memD, int *pc, struct controle *sinais, st
   *aux->regTemp->di_ex->inst = *regTemp->di_ex->inst;
 
   aux->regTemp->ex_mem->pc = regTemp->ex_mem->pc;
+   aux->regTemp->ex_mem->DVC = regTemp->ex_mem->DVC;
   aux->regTemp->ex_mem->saidaULA = regTemp->ex_mem->saidaULA;
   aux->regTemp->ex_mem->B = regTemp->ex_mem->B;
   aux->regTemp->ex_mem->muxRegDst = regTemp->ex_mem->muxRegDst;  
@@ -732,7 +737,7 @@ void exibir_sinais(WINDOW *sinwin, struct controle *sinais) {
     wrefresh(sinwin);
 }
 
-void exibir_atual(WINDOW *atuwin, struct instrucao *mem, int n_instrucoes) {
+void exibir_atual(WINDOW *atuwin, int  *mem, int n_instrucoes) {
 
     wclear(atuwin);
     box(atuwin, 0, 0);
@@ -742,75 +747,98 @@ void exibir_atual(WINDOW *atuwin, struct instrucao *mem, int n_instrucoes) {
     wrefresh(atuwin);
 }
 
-void exibir_pc(WINDOW *pcwin, int *PC) {
+void exibir_pc(WINDOW *pcwin, int *PC){
 
     wclear(pcwin);
     box(pcwin, 0, 0);
-    mvwprintw(pcwin, 1, 8, "PC: %i", PC);
+    mvwprintw(pcwin, 1, 8, "PC: %i", *PC);
 
     wrefresh(pcwin);
 }
 
-int menu(struct controle *sinais, int *PC, struct regiS *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq, WINDOW *regwin, WINDOW *regtwin, WINDOW *sinwin, WINDOW *pcwin, WINDOW *atuwin) {
-    refresh();
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq){
+  refresh();
+
+  // *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual
 
     box(menuwin, 0, 0);
-    keypad(menuwin, TRUE);
+    keypad(menuwin, TRUE); // Habilita captura de teclas especiais
     wrefresh(menuwin);
-
+    // Desenhando o cabeçalho
+    mvwprintw(menuwin, 1, 2, "\t");
+    mvwprintw(menuwin, 2, 2, "\t\t\t\t\t");
+    mvwprintw(menuwin, 3, 2, "\t");
+   // mvwprintw(menuwin, 5, 2, "\tPC: %i Instrução:  Estado: ", *PC);  // Valores de exemplo
+  //  mvwprintw(menuwin, 7, 2, "\tInstrução em Assembly: ");
     mvwprintw(menuwin, 6, 14, "(r) (RUN) Executar todo o arquivo");
     mvwprintw(menuwin, 8, 14, "(e) (STEP) Executar uma linha");
     mvwprintw(menuwin, 10, 14, "(b) (BACK) Voltar uma instrução");
+   // mvwprintw(menuwin, 12, 2, "\t(v) Ver Estado");
+   // mvwprintw(menuwin, 13, 2, "\t(a) Ver Instrução Atual");
+   // mvwprintw(menuwin, 14, 2, "\t(i) Ver Registradores");
+   // mvwprintw(menuwin, 15, 2, "\t(d) Ver Memória de Dados");
+   // mvwprintw(menuwin, 16, 2, "\t(i) Ver Todas as Instruções");
+   // mvwprintw(menuwin, 17, 2, "\t(s) Ver Sinais");
+   // mvwprintw(menuwin, 18, 2, "\t(t) Ver Variáveis");
+   // mvwprintw(menuwin, 19, 2, "\t(c) Ver Registradores Temporários");
     mvwprintw(menuwin, 12, 14, "(m) Salvar .asm");
     mvwprintw(menuwin, 14, 14, "(t) Salvar .dat");
     mvwprintw(menuwin, 16, 14, "(x) Sair");
+   // mvwprintw(menuwin, 21, 2, "\t");
+    //mvwprintw(menuwin, 22, 2, "\tSelecione: p: ");
     wrefresh(menuwin);
+    char op =  getch();
 
-    char op = getch();
+   if(op == '\n'){
+    op = 'e';
+    wrefresh(memwin);
+  }
+  switch(op){
+    case 'r':
+      return 1;
+      break;
+    case 'e':
+      return 0;
+      break;
+    case 'b':
+      if (pilha->tam != 0) {
+        fback(registrador, mem, PC, sinais, var, regis, pilha, 1, countBeq);
+        refresh();
+       }
+      else {
+        printf("Nenhuma instrução para voltar\n");
+      }
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
+      refresh();
+      break;
+    case 't':
+      salvarDat(mem);
 
-    if (op == '\n') {
-        op = 'e';
-    }
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
+      refresh();
+      break;
+    case 'm':
+      salvarAsm(regmem, n_instrucoes);
 
-    switch (op) {
-        case 'r':
-            return 1;
-        case 'e':
-            wrefresh(memwin);
-            wrefresh(regwin);
-            wrefresh(atuwin);
-            wrefresh(regtwin);
-            wrefresh(pcwin);
-            wrefresh(sinwin);
-            return 0;
-        case 'b':
-            if (pilha->tam != 0) {
-                fback(registrador, mem, PC, sinais, var, regis, pilha, 1, countBeq);
-            }
-            wrefresh(memwin);
-            wrefresh(regwin);
-            wrefresh(atuwin);
-            wrefresh(regtwin);
-            wrefresh(pcwin);
-            wrefresh(sinwin);
-            if (pilha->tam == 0) {
-                printf("Nenhuma instrução para voltar\n");
-            }
-            return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
-        case 't':
-            salvarDat(mem);
-            return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
-        case 'm':
-            salvarAsm(regmem, n_instrucoes);
-            return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
-        case 'x':
-            printf("Programa finalizado\n");
-            return 3;
-        default:
-            return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
-    }
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
+      refresh();
+      break;
+
+    case 'x':
+      printf("Programa finalizado\n");
+      return 3;
+      break;
+
+    default:
+      //printf("Opção inválida\n");
+      scanf("%c", &op);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
+      refresh();
+      break;
+
+  }
+  return 3;
 }
-
 
 void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq){
   if((inst.opcode == 8 && flag == 1 && *countBeq == 0) || (inst.opcode == 2 && *countBeq == 0)){
@@ -926,5 +954,27 @@ void salvarDat(int *memD){
   }
   fclose(arquivo);
   printf("\n\nDados salvos com sucesso.\n");
+}
+
+
+void draw_textbox(WINDOW *win, int start_y, int start_x, int width, int height) {
+    box(win, 0, 0);
+    mvwprintw(win, 0, 2, " Text Box ");
+    wrefresh(win);
+}
+
+void get_input(WINDOW *win, char *input, int len) {
+    echo();
+    mvwgetnstr(win, 1, 1, input, len);
+    noecho();
+}
+void draw_pipeline_art(WINDOW *win) {
+    int start_x = (getmaxx(win) - 62) / 2;
+    mvwprintw(win, 5, start_x, "        _____  _  _____  ____  __      _  _    _  ____ ");
+    mvwprintw(win, 6, start_x, "       |  __ || ||  __ ||  __|| |     | || |  | ||  __|");
+    mvwprintw(win, 7, start_x, "       | |__ || || |__ || |__ | |     | || |\\ | || |__ ");
+    mvwprintw(win, 8, start_x, "       |  ___|| ||  ___||  __|| |     | || | \\| ||  __|");
+    mvwprintw(win, 9, start_x, "       | |    | || |    | |__ | |____ | || |  \\ || |__ ");
+   mvwprintw(win, 10, start_x, "       |_|    |_||_|    |____||______||_||_|   \\||____|");
 }
 

@@ -4,33 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-void draw_textbox(WINDOW *win, int start_y, int start_x, int width, int height) {
-    box(win, 0, 0);
-    mvwprintw(win, 0, 2, " Text Box ");
-    wrefresh(win);
-}
-
-void get_input(WINDOW *win, char *input, int len) {
-    echo();
-    mvwgetnstr(win, 1, 1, input, len);
-    noecho();
-}
-
-void draw_pipeline_art(WINDOW *win) {
-    int start_x = (getmaxx(win) - 62) / 2;
-    mvwprintw(win, 5, start_x, "        _____  _  _____  ____  __      _  _    _  ____ ");
-    mvwprintw(win, 6, start_x, "       |  __ || ||  __ ||  __|| |     | || |  | ||  __|");
-    mvwprintw(win, 7, start_x, "       | |__ || || |__ || |__ | |     | || |\\ | || |__ ");
-    mvwprintw(win, 8, start_x, "       |  ___|| ||  ___||  __|| |     | || | \\| ||  __|");
-    mvwprintw(win, 9, start_x, "       | |    | || |    | |__ | |____ | || |  \\ || |__ ");
-    mvwprintw(win, 10, start_x, "       |_|    |_||_|    |____||______||_||_|   \\||____|");
-}
-
 int main() {
-    initscr();
-    cbreak();
-    noecho();
-    curs_set(FALSE);
+    initscr();      
+    cbreak();       
+    noecho();       
+    curs_set(FALSE); 
 
     int height, width;
     getmaxyx(stdscr, height, width);
@@ -66,7 +44,7 @@ int main() {
         } else if (ch == 'T' || ch == 't' || ch == 'D' || ch == 'd') {
             char file_name[20];
             strcpy(file_name, (ch == 'T' || ch == 't') ? inst_file : data_file);
-            curs_set(TRUE);
+            curs_set(TRUE); 
             WINDOW *inputwin = newwin(3, 40, (height / 2) + 10, (width / 2) - 20);
             draw_textbox(inputwin, 1, 1, 38, 1);
             mvwprintw(inputwin, 0, 2, " Editando %s ", file_name);
@@ -75,18 +53,13 @@ int main() {
 
             char new_file_name[20];
             get_input(inputwin, new_file_name, 19);
-            
+
             if (ch == 'T' || ch == 't') {
                 strcpy(inst_file, new_file_name);
-                mvwprintw(inputwin, 2, 2, "Arquivo editado com sucesso!");
-
             } else if (ch == 'D' || ch == 'd') {
                 strcpy(data_file, new_file_name);
-                mvwprintw(inputwin, 2, 2, "Arquivo editado com sucesso!");
-
             }
-            wrefresh(inputwin);
-            napms(2000);
+
             delwin(inputwin);
         }
 
@@ -94,7 +67,6 @@ int main() {
         clear();
         refresh();
     }
-
 
     int *pc = (int *)malloc(sizeof(int));
     *pc = 0;
@@ -116,17 +88,17 @@ int main() {
     int n_instrucoes = carregarMemoria(inst_file, regmem);
     carregarDados(data_file, memD);
 
-    curs_set(FALSE);
+    curs_set(FALSE); 
     WINDOW *menuwin = newwin(24, 62, (height / 2) - 12, (width / 2) - 31);
     WINDOW *regwin = newwin(11, 30, height - 11, 1);
-    WINDOW *regtwin = newwin(25, 40, (height / 2) - 12, 1);
-    WINDOW *memwin = newwin(11, 120, height - 11, (width / 2) - 60);
+    WINDOW *regtwin = newwin(25, 40, (height / 2) - 12, 1); 
+    WINDOW *memwin = newwin(11, 120, height - 11, (width / 2) - 60); 
     WINDOW *sinwin = newwin(12, 30, (height / 2), width - 31);
-    WINDOW *pcwin = newwin(3, 20, (height / 2) - 7, width - 22);
+    WINDOW *pcwin = newwin(3, 20, (height / 2) - 7, width - 22); 
     WINDOW *atuwin = newwin(4, 20, (height / 2) - 4, width - 22);
-
     draw_pipeline_art(stdscr);
     refresh();
+
 
     do {
         fback(registradores, memD, pc, sinais, var, regS1, pilha, 0, countBeq);
@@ -141,31 +113,15 @@ int main() {
             exibir_regt(regtwin, regS1);
             exibir_memoria(memwin, memD);
             exibir_sinais(sinwin, sinais);
-            exibir_pc(pcwin, *pc);
+            exibir_pc(pcwin, pc);
             exibir_atual(atuwin, memD, n_instrucoes);
 
-            // Atualiza todas as janelas
-            wrefresh(regwin);
-            wrefresh(regtwin);
-            wrefresh(memwin);
-            wrefresh(sinwin);
-            wrefresh(pcwin);
-            wrefresh(atuwin);
-
-            op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
+            op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
 
             if (op == 3) {
                 break;
             }
         }
-
-        // Atualiza todas as janelas novamente após o menu
-        wrefresh(regwin);
-        wrefresh(regtwin);
-        wrefresh(memwin);
-        wrefresh(sinwin);
-        wrefresh(pcwin);
-        wrefresh(atuwin);
     //////
 
     *pc = var->muxDVI;
@@ -178,10 +134,7 @@ int main() {
 
     UC(sinais, regS1->bi_di);
 
-    BancoRegistradores(registradores, regS1->bi_di->inst->b11_9,
-                       regS1->bi_di->inst->b8_6, regS1->mem_er->muxRegDst,
-                       var->muxMemReg, var->saida1, var->saida2,
-                       regS1->mem_er->sinais->EscReg);
+    BancoRegistradores(registradores, regS1->bi_di->inst->b11_9, regS1->bi_di->inst->b8_6, regS1->mem_er->muxRegDst, var->muxMemReg, var->saida1, var->saida2, regS1->mem_er->sinais->EscReg);
 
     *regS2->di_ex->inst = *regS1->bi_di->inst;
     *regS2->di_ex->sinais = *sinais;
@@ -193,13 +146,15 @@ int main() {
 
     if (regS1->di_ex->sinais->RegDst == 0) {
       var->muxRegDst = regS1->di_ex->inst->b8_6;
-    } else {
+    } 
+    else {
       var->muxRegDst = regS1->di_ex->inst->b5_3;
     }
 
     if (regS1->di_ex->sinais->ULAFonte == 1) {
       var->muxULA = regS1->di_ex->inst->b5_0;
-    } else {
+    } 
+    else {
       var->muxULA = regS1->di_ex->B;
     }
 
@@ -217,22 +172,26 @@ int main() {
     regS2->ex_mem->flag = *var->flag;
     //////////EX/MEM
 
-    memDados(memD, regS1->ex_mem->saidaULA, regS1->ex_mem->B,
-             regS1->ex_mem->sinais->EscMem, var->saidaMem);
+    memDados(memD, regS1->ex_mem->saidaULA, regS1->ex_mem->B, regS1->ex_mem->sinais->EscMem, var->saidaMem);
 
     if ((regS1->ex_mem->flag + regS1->ex_mem->sinais->DVC) == 2) {
       var->muxDVC = 1;
     }
+    else{
+	  var->muxDVC = 0;
+	}
     if (var->muxDVC == 1) {
-      var->muxDVC = regS1->ex_mem->pc + 1 + regS1->ex_mem->inst->b5_0;
-    } else {
-      var->muxDVC = *pc + 1;
+      regS1->ex_mem->DVC = regS1->ex_mem->pc + 1 + regS1->ex_mem->inst->b5_0;
+    } 
+    else {
+      regS1->ex_mem->DVC = *pc + 1;
     }
 
     if (regS1->ex_mem->sinais->DVI == 0) {
-      var->muxDVI = var->muxDVC;
-    } else {
-      var->muxDVI = regS1->ex_mem->pc + 1 + regS1->ex_mem->inst->b0_6;
+      var->muxDVI = regS1->ex_mem->DVC;
+    } 
+    else {
+      var->muxDVI = regS1->ex_mem->inst->b0_6;
     }
 
     *regS2->mem_er->inst = *regS1->ex_mem->inst;
@@ -246,13 +205,12 @@ int main() {
 
     if (regS1->mem_er->sinais->MemParaReg == 1) {
       var->muxMemReg = regS1->mem_er->saidaULA;
-    } else {
+    } 
+    else {
       var->muxMemReg = regS1->mem_er->saidaMem;
     }
 
-    BancoRegistradores(registradores, 0, 0, regS1->mem_er->muxRegDst,
-                       var->muxMemReg, NULL, NULL,
-                       regS1->mem_er->sinais->EscReg);
+    BancoRegistradores(registradores, 0, 0, regS1->mem_er->muxRegDst, var->muxMemReg, NULL, NULL, regS1->mem_er->sinais->EscReg);
 
     ////////////////
 
@@ -261,14 +219,6 @@ int main() {
     //////////
 
   } while (1);
-    delwin(menuwin);
-    delwin(regwin);
-    delwin(regtwin);
-    delwin(memwin);
-    delwin(sinwin);
-    delwin(pcwin);
-    delwin(atuwin);
-
   endwin();
   return 0;
 }

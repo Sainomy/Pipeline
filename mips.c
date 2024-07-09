@@ -180,7 +180,7 @@ int carregarMemoria(char *nomeArquivo, struct instrucao *mem){
 }
 void carregarDados(char *nomeArquivo, int *memD) {
     FILE *arquivo;
-    arquivo = fopen(nomeArquivo, "r");
+    arquivo = fopen("dados.txt", "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo para carregar.\n");
         return;
@@ -506,7 +506,7 @@ void verSinais(struct controle *sinais){
 };
 
 
-void fback(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose){
+void fback(int *registradores, int *memD, int *pc, struct controle *sinais, struct variaveis *var, struct regiS *regTemp, Pilha *pilha, int chose, int *countbeq){
   if(chose == 0){
     Nodo *aux = criaNodo(registradores, memD, pc, sinais, var, regTemp);
     push(pilha, aux->estado);
@@ -751,7 +751,7 @@ void exibir_pc(WINDOW *pcwin, int *PC) {
     wrefresh(pcwin);
 }
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, WINDOW *atuwin, WINDOW *pcwin, WINDOW *sinwin,WINDOW *regwin, WINDOW *regtwin){
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq){
   refresh();
 
   // *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual
@@ -786,12 +786,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
 
    if(op == '\n'){
     op = 'e';
-            wrefresh(memwin);
-            wrefresh(regwin);
-            wrefresh(sinwin);
-            wrefresh(atuwin);
-            wrefresh(pcwin);
-            wrefresh(regtwin);
+    wrefresh(memwin);
   }
   switch(op){
     case 'r':
@@ -802,40 +797,25 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       break;
     case 'b':
       if (pilha->tam != 0) {
-        fback(registrador, mem, PC, sinais, var, regis, pilha, 1);
-         wrefresh(memwin);
-            wrefresh(regwin);
-            wrefresh(sinwin);
-            wrefresh(atuwin);
-            wrefresh(pcwin);
-            wrefresh(regtwin);
+        fback(registrador, mem, PC, sinais, var, regis, pilha, 1, countBeq);
+        refresh();
        }
       else {
-         wrefresh(memwin);
-            wrefresh(regwin);
-            wrefresh(sinwin);
-            wrefresh(atuwin);
-            wrefresh(pcwin);
-            wrefresh(regtwin);
         printf("Nenhuma instrução para voltar\n");
       }
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, atuwin, pcwin, sinwin, regwin, regtwin);
-      wrefresh(memwin);
-            wrefresh(regwin);
-            wrefresh(sinwin);
-            wrefresh(atuwin);
-            wrefresh(pcwin);
-            wrefresh(regtwin);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
+      refresh();
       break;
     case 't':
       salvarDat(mem);
 
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes,atuwin, pcwin, sinwin, regwin, regtwin );
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
       refresh();
       break;
     case 'm':
       salvarAsm(regmem, n_instrucoes);
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes,atuwin, pcwin, sinwin, regwin, regtwin);
+
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
       refresh();
       break;
 
@@ -847,7 +827,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
     default:
       //printf("Opção inválida\n");
       scanf("%c", &op);
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, atuwin, pcwin, sinwin, regwin, regtwin);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
       refresh();
       break;
 
@@ -856,7 +836,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
 }
 
 void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq){
-  if(inst.opcode == 8 && flag == 1 && *countBeq == 0){
+  if((inst.opcode == 8 && flag == 1 && *countBeq == 0) || (inst.opcode == 2 && *countBeq == 0)){
     *sinais = zerarSinais();
     *regTemp->di_ex->sinais = zerarSinais();
     (*countBeq)++;
@@ -880,10 +860,6 @@ void HazardControle(struct regiS *regTemp, struct instrucao inst, struct control
   if(*countBeq == 3){
     *countBeq = 0;
     return;
-  }
-  if(*countBeq >= 1){
-  (*countBeq)++;
-  return;
   }
 }
 

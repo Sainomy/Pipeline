@@ -36,7 +36,7 @@ int main() {
     getmaxyx(stdscr, height, width);
 
     char inst_file[20] = "t.txt";
-    char data_file[20] = "dados.txt";
+    char data_file[20] = "dados.dat";
     int *memD = iniciarMemD();
 
     while (1) {
@@ -118,13 +118,12 @@ int main() {
     WINDOW *sinwin = newwin(12, 30, (height / 2), width - 31);
     WINDOW *pcwin = newwin(3, 20, (height / 2) - 7, width - 22); 
     WINDOW *atuwin = newwin(4, 20, (height / 2) - 4, width - 22);
-
     draw_pipeline_art(stdscr);
     refresh();
 
 
     do {
-        fback(registradores, memD, pc, sinais, var, regS1, pilha, 0);
+        fback(registradores, memD, pc, sinais, var, regS1, pilha, 0, countBeq);
 
         if (*(pc) == (5 + n_instrucoes)) {
             mvwprintw(menuwin, 21, 2, "Todas as instruções foram executadas");
@@ -139,8 +138,7 @@ int main() {
             exibir_pc(pcwin, *pc);
             exibir_atual(atuwin, memD, n_instrucoes);
 
-            op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes, atuwin, pcwin, sinwin,regwin, regtwin);
-           
+            op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
 
             if (op == 3) {
                 break;

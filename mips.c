@@ -751,7 +751,7 @@ void exibir_pc(WINDOW *pcwin, int *PC) {
     wrefresh(pcwin);
 }
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countbeq){
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq){
   refresh();
 
   // *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual

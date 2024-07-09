@@ -36,7 +36,7 @@ int main() {
     getmaxyx(stdscr, height, width);
 
     char inst_file[20] = "t.txt";
-    char data_file[20] = "dados.dat";
+    char data_file[20] = "dados.txt";
     int *memD = iniciarMemD();
 
     while (1) {

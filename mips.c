@@ -180,7 +180,7 @@ int carregarMemoria(char *nomeArquivo, struct instrucao *mem){
 }
 void carregarDados(char *nomeArquivo, int *memD) {
     FILE *arquivo;
-    arquivo = fopen("dados.txt", "r");
+    arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo para carregar.\n");
         return;

@@ -140,7 +140,7 @@ void decodificarOpcode(struct instrucao *mem, int n_instrucoes);
 
 struct controle * iniciarConrole();
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq);
+int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq, WINDOW *regwin, WINDOW *regtwin, WINDOW *sinwin, WINDOW *pcwin, WINDOW *atuwin);
 
 int * iniciarRegi();
 int * iniciarMemD();

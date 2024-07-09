@@ -751,89 +751,66 @@ void exibir_pc(WINDOW *pcwin, int *PC) {
     wrefresh(pcwin);
 }
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq){
-  refresh();
-
-  // *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual
+int menu(struct controle *sinais, int *PC, struct regiS *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq, WINDOW *regwin, WINDOW *regtwin, WINDOW *sinwin, WINDOW *pcwin, WINDOW *atuwin) {
+    refresh();
 
     box(menuwin, 0, 0);
-    keypad(menuwin, TRUE); // Habilita captura de teclas especiais
+    keypad(menuwin, TRUE);
     wrefresh(menuwin);
-    // Desenhando o cabeçalho
-    mvwprintw(menuwin, 1, 2, "\t");
-    mvwprintw(menuwin, 2, 2, "\t\t\t\t\t");
-    mvwprintw(menuwin, 3, 2, "\t");
-   // mvwprintw(menuwin, 5, 2, "\tPC: %i Instrução:  Estado: ", *PC);  // Valores de exemplo
-  //  mvwprintw(menuwin, 7, 2, "\tInstrução em Assembly: ");
+
     mvwprintw(menuwin, 6, 14, "(r) (RUN) Executar todo o arquivo");
     mvwprintw(menuwin, 8, 14, "(e) (STEP) Executar uma linha");
     mvwprintw(menuwin, 10, 14, "(b) (BACK) Voltar uma instrução");
-   // mvwprintw(menuwin, 12, 2, "\t(v) Ver Estado");
-   // mvwprintw(menuwin, 13, 2, "\t(a) Ver Instrução Atual");
-   // mvwprintw(menuwin, 14, 2, "\t(i) Ver Registradores");
-   // mvwprintw(menuwin, 15, 2, "\t(d) Ver Memória de Dados");
-   // mvwprintw(menuwin, 16, 2, "\t(i) Ver Todas as Instruções");
-   // mvwprintw(menuwin, 17, 2, "\t(s) Ver Sinais");
-   // mvwprintw(menuwin, 18, 2, "\t(t) Ver Variáveis");
-   // mvwprintw(menuwin, 19, 2, "\t(c) Ver Registradores Temporários");
     mvwprintw(menuwin, 12, 14, "(m) Salvar .asm");
     mvwprintw(menuwin, 14, 14, "(t) Salvar .dat");
     mvwprintw(menuwin, 16, 14, "(x) Sair");
-   // mvwprintw(menuwin, 21, 2, "\t");
-    //mvwprintw(menuwin, 22, 2, "\tSelecione: p: ");
     wrefresh(menuwin);
-    char op =  getch();
 
-   if(op == '\n'){
-    op = 'e';
-    wrefresh(memwin);
-  }
-  switch(op){
-    case 'r':
-      return 1;
-      break;
-    case 'e':
-      return 0;
-      break;
-    case 'b':
-      if (pilha->tam != 0) {
-        fback(registrador, mem, PC, sinais, var, regis, pilha, 1, countBeq);
-        refresh();
-       }
-      else {
-        printf("Nenhuma instrução para voltar\n");
-      }
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
-      refresh();
-      break;
-    case 't':
-      salvarDat(mem);
+    char op = getch();
 
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
-      refresh();
-      break;
-    case 'm':
-      salvarAsm(regmem, n_instrucoes);
+    if (op == '\n') {
+        op = 'e';
+    }
 
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
-      refresh();
-      break;
-
-    case 'x':
-      printf("Programa finalizado\n");
-      return 3;
-      break;
-
-    default:
-      //printf("Opção inválida\n");
-      scanf("%c", &op);
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
-      refresh();
-      break;
-
-  }
-  return 3;
+    switch (op) {
+        case 'r':
+            return 1;
+        case 'e':
+            wrefresh(memwin);
+            wrefresh(regwin);
+            wrefresh(atuwin);
+            wrefresh(regtwin);
+            wrefresh(pcwin);
+            wrefresh(sinwin);
+            return 0;
+        case 'b':
+            if (pilha->tam != 0) {
+                fback(registrador, mem, PC, sinais, var, regis, pilha, 1, countBeq);
+            }
+            wrefresh(memwin);
+            wrefresh(regwin);
+            wrefresh(atuwin);
+            wrefresh(regtwin);
+            wrefresh(pcwin);
+            wrefresh(sinwin);
+            if (pilha->tam == 0) {
+                printf("Nenhuma instrução para voltar\n");
+            }
+            return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
+        case 't':
+            salvarDat(mem);
+            return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
+        case 'm':
+            salvarAsm(regmem, n_instrucoes);
+            return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
+        case 'x':
+            printf("Programa finalizado\n");
+            return 3;
+        default:
+            return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
+    }
 }
+
 
 void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq){
   if((inst.opcode == 8 && flag == 1 && *countBeq == 0) || (inst.opcode == 2 && *countBeq == 0)){
@@ -950,3 +927,4 @@ void salvarDat(int *memD){
   fclose(arquivo);
   printf("\n\nDados salvos com sucesso.\n");
 }
+

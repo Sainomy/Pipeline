@@ -166,7 +166,7 @@ void exibir_regt(WINDOW *regtwin, struct regiS  *regisT);
 void exibir_sinais(WINDOW *sinwin, struct controle *sinais);
 
 void exibir_pc(WINDOW *pcwin, int *PC);
-void exibir_atual(WINDOW *atuwin, int*mem, int n_instrucoes);
+void exibir_atual(WINDOW *atuwin, struct instrucao *mem, int n_instrucoes, int *PC);
 
 
 void HazardControle(struct regiS *regTemp, struct instrucao inst, struct controle *sinais, int flag, int *countBeq);
@@ -174,6 +174,7 @@ struct controle zerarSinais();
 
 void salvarAsm(struct instrucao *regmem, int n_instrucoes);
 void salvarDat(int *memD);
+char *traduzirAsm(struct instrucao *mem, int pc);
 
 void draw_textbox(WINDOW *win, int start_y, int start_x, int width, int height);
 void get_input(WINDOW *win, char *input, int len);

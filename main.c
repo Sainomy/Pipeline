@@ -5,10 +5,10 @@
 #include <string.h>
 
 int main() {
-    initscr();      
-    cbreak();       
-    noecho();       
-    curs_set(FALSE); 
+    initscr();
+    cbreak();
+    noecho();
+    curs_set(FALSE);
 
     int height, width;
     getmaxyx(stdscr, height, width);
@@ -118,7 +118,7 @@ int main() {
             exibir_memoria(memwin, memD);
             exibir_sinais(sinwin, sinais);
             exibir_pc(pcwin, pc);
-            exibir_atual(atuwin, memD, n_instrucoes);
+            exibir_atual(atuwin, regmem, n_instrucoes, pc);
 
             op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
             wrefresh(regwin);

@@ -756,11 +756,11 @@ void exibir_pc(WINDOW *pcwin, int *PC){
     wrefresh(pcwin);
 }
 
-int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq){
+int menu(struct controle *sinais, int *PC, struct regiS *regis, int *registrador, int *mem, struct variaveis *var, Pilha *pilha, WINDOW *menuwin, WINDOW *memwin, struct instrucao *regmem, int n_instrucoes, int *countBeq, WINDOW *regwin, WINDOW *regtwin, WINDOW *sinwin, WINDOW *pcwin, WINDOW *atuwin) {
   refresh();
 
   // *PC, mem[*PC].instrucoes.instrucao, sinais->estado_atual
-
+  werase(menuwin);
     box(menuwin, 0, 0);
     keypad(menuwin, TRUE); // Habilita captura de teclas especiais
     wrefresh(menuwin);
@@ -798,29 +798,45 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
       return 1;
       break;
     case 'e':
+            wrefresh(memwin);
+            wrefresh(regwin);
+            wrefresh(atuwin);
+            wrefresh(regtwin);
+            wrefresh(pcwin);
+            wrefresh(sinwin);
       return 0;
       break;
-    case 'b':
-      if (pilha->tam != 0) {
-        fback(registrador, mem, PC, sinais, var, regis, pilha, 1, countBeq);
-        refresh();
-       }
-      else {
-        printf("Nenhuma instrução para voltar\n");
-      }
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
-      refresh();
-      break;
-    case 't':
+   case 'b':
+            if (pilha->tam != 0) {
+                fback(registrador, mem, PC, sinais, var, regis, pilha, 1, countBeq);
+                exibir_registradores(regwin, registrador);
+                exibir_regt(regtwin, regis);
+                exibir_memoria(memwin, mem);
+                exibir_sinais(sinwin, sinais);
+                exibir_pc(pcwin, PC);
+                exibir_atual(atuwin, mem, n_instrucoes);
+                wrefresh(memwin);
+                wrefresh(regwin);
+                wrefresh(atuwin);
+                wrefresh(regtwin);
+                wrefresh(pcwin);
+                wrefresh(sinwin);
+            } else {
+                mvwprintw(menuwin, 18, 14, "Nenhuma instrucao para voltar");
+                wrefresh(menuwin);
+                napms(2000); 
+            }
+            return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
+        case 't':
       salvarDat(mem);
 
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
       refresh();
       break;
     case 'm':
       salvarAsm(regmem, n_instrucoes);
 
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
       refresh();
       break;
 
@@ -832,7 +848,7 @@ int menu(struct controle *sinais, int *PC, struct regiS  *regis, int *registrado
     default:
       //printf("Opção inválida\n");
       scanf("%c", &op);
-      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
+      return menu(sinais, PC, regis, registrador, mem, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
       refresh();
       break;
 

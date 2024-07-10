@@ -51,18 +51,22 @@ int main() {
             mvwprintw(inputwin, 1, 1, "digite_");
             wrefresh(inputwin);
 
-            char new_file_name[20];
+                char new_file_name[20];
             get_input(inputwin, new_file_name, 19);
-
+            
             if (ch == 'T' || ch == 't') {
                 strcpy(inst_file, new_file_name);
+                mvwprintw(inputwin, 2, 2, "Arquivo editado com sucesso!");
+
             } else if (ch == 'D' || ch == 'd') {
                 strcpy(data_file, new_file_name);
-            }
+                mvwprintw(inputwin, 2, 2, "Arquivo editado com sucesso!");
 
+            }
+            wrefresh(inputwin);
+            napms(2000);
             delwin(inputwin);
         }
-
         delwin(startwin);
         clear();
         refresh();
@@ -116,12 +120,25 @@ int main() {
             exibir_pc(pcwin, pc);
             exibir_atual(atuwin, memD, n_instrucoes);
 
-            op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq);
-
+            op = menu(sinais, pc, regS1, registradores, memD, var, pilha, menuwin, memwin, regmem, n_instrucoes, countBeq, regwin, regtwin, sinwin, pcwin, atuwin);
+            wrefresh(regwin);
+            wrefresh(regtwin);
+            wrefresh(memwin);
+            wrefresh(sinwin);
+            wrefresh(pcwin);
+            wrefresh(atuwin);
             if (op == 3) {
                 break;
             }
         }
+
+        // Atualiza todas as janelas novamente após o menu
+        wrefresh(regwin);
+        wrefresh(regtwin);
+        wrefresh(memwin);
+        wrefresh(sinwin);
+        wrefresh(pcwin);
+        wrefresh(atuwin);
     //////
 
     *pc = var->muxDVI;

@@ -17,11 +17,7 @@ struct controle{
   int EscReg;
   int MemParaReg;
   int ULAFonte;
-  //int ULAFonteDown;
   int ULAOp;
-  //int branch;
-  //int PCEsc;
-  //int FontePC;
   int DVI;
   int DVC;
   };
@@ -101,7 +97,6 @@ typedef struct{
 
   int *registradores;
   int *memD;
- // struct instrucao *inst;
   int pc;
   struct controle sinais;
   struct variaveis var;

@@ -627,14 +627,19 @@ void exibir_sinais(WINDOW *sinwin, struct controle *sinais) {
     wrefresh(sinwin);
 }
 
-void exibir_atual(WINDOW *atuwin, int  *mem, int n_instrucoes) {
+void exibir_atual(WINDOW *atuwin, struct instrucao *mem, int n_instrucoes, int *PC) {
 
     wclear(atuwin);
     box(atuwin, 0, 0);
-    mvwprintw(atuwin, 0, 1, "INSTRUCAO MIPS:");
-   // mvwprintw(atuwin, 2, 2, "%i", );
+    char *assembly = traduzirAsm(mem, *PC);
+    mvwprintw(atuwin, 1, 1, "INSTRUCAO MIPS: \n    %s", assembly);
+
+    //char *assembly = traduzirAsm(mem, *PC);
+
+    //mvwprintw(atuwin, 2, 2, "%s", assembly);
 
     wrefresh(atuwin);
+	free(assembly);
 }
 
 void exibir_pc(WINDOW *pcwin, int *PC){
@@ -661,7 +666,7 @@ int menu(struct controle *sinais, int *PC, struct regiS *regis, int *registrador
     mvwprintw(menuwin, 8, 14, "(e) (STEP) Executar uma linha");
     mvwprintw(menuwin, 10, 14, "(b) (BACK) Voltar uma instrução");
     mvwprintw(menuwin, 12, 14, "(m) Salvar .asm");
-    mvwprintw(menuwin, 14, 14, "(t) Salvar .dat");
+    mvwprintw(menuwin, 14, 14, "(t) Salvar .dat e chorar");
     mvwprintw(menuwin, 16, 14, "(x) Sair");
     wrefresh(menuwin);
     char op =  getch();
@@ -691,7 +696,7 @@ int menu(struct controle *sinais, int *PC, struct regiS *regis, int *registrador
                 exibir_memoria(memwin, mem);
                 exibir_sinais(sinwin, sinais);
                 exibir_pc(pcwin, PC);
-                exibir_atual(atuwin, mem, n_instrucoes);
+                exibir_atual(atuwin, regmem, n_instrucoes, PC);
                 wrefresh(memwin);
                 wrefresh(regwin);
                 wrefresh(atuwin);
@@ -835,6 +840,51 @@ void salvarAsm(struct instrucao *mem, int n_instrucoes) {
   printf("\nArquivo .asm salvo com sucesso.\n");
 }
 
+char *traduzirAsm(struct instrucao *mem, int pc){
+	int i = pc;
+	char *assembly = malloc(sizeof(char) * 100);
+	switch (mem[i].opcode) {
+		case 0:
+			switch (mem[i].funct) {
+				case 0:
+		          	sprintf(assembly, "add $%d, $%d, $%d\n", mem[i].b5_3, mem[i].b11_9, mem[i].b8_6);
+          			break;
+        			case 2:
+          			sprintf(assembly, "sub $%d, $%d, $%d\n", mem[i].b5_3, mem[i].b11_9, mem[i].b8_6);
+          			break;
+        			case 5:
+          			sprintf(assembly, "or $%d, $%d, $%d\n", mem[i].b5_3, mem[i].b11_9, mem[i].b8_6);
+          			break;
+        			case 4:
+          			sprintf(assembly, "and $%d, $%d, $%d\n", mem[i].b5_3, mem[i].b11_9, mem[i].b8_6);
+          			break;
+        			default:
+          			printf("Instrução inválida \n");
+          			break;
+    			}
+		break;
+		case 4:
+			sprintf(assembly, "addi $%d, $%d, %d\n", mem[i].b8_6, mem[i].b11_9, mem[i].b5_0);
+		break;
+		case 11:
+			sprintf(assembly, "lw $%d, %d($%d)\n", mem[i].b8_6, mem[i].b5_0, mem[i].b11_9);
+		break;
+		case 15:
+			sprintf(assembly, "sw $%d, %d($%d)\n", mem[i].b8_6, mem[i].b5_0, mem[i].b11_9);
+		break;
+		case 8:
+			sprintf(assembly, "beq $%d, $%d, %d\n", mem[i].b8_6, mem[i].b11_9, mem[i].b5_0);
+		break;
+		case 2:
+			sprintf(assembly, "j %d\n", mem[i].b0_6);
+		break;
+		default:
+			printf("Opção inválida!!!\n");
+		break;
+	}
+	return assembly;
+}
+
 void salvarDat(int *memD){
   FILE *arquivo;
   arquivo = fopen("dados.txt", "w");
@@ -870,4 +920,3 @@ void draw_pipeline_art(WINDOW *win) {
     mvwprintw(win, 9, start_x, "       | |    | || |    | |__ | |____ | || |  \\ || |__ ");
    mvwprintw(win, 10, start_x, "       |_|    |_||_|    |____||______||_||_|   \\||____|");
 }
-

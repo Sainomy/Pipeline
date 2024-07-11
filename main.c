@@ -14,7 +14,7 @@ int main() {
     getmaxyx(stdscr, height, width);
 
     char inst_file[20] = "t.txt";
-    char data_file[20] = "dados.txt";
+    char data_file[20] = "dados.dat";
     int *memD = iniciarMemD();
 
     while (1) {
@@ -98,14 +98,32 @@ int main() {
     WINDOW *regtwin = newwin(25, 40, (height / 2) - 12, 1); 
     WINDOW *memwin = newwin(11, 120, height - 11, (width / 2) - 60); 
     WINDOW *sinwin = newwin(12, 30, (height / 2), width - 31);
-    WINDOW *pcwin = newwin(3, 20, (height / 2) - 7, width - 22); 
-    WINDOW *atuwin = newwin(4, 20, (height / 2) - 4, width - 22);
+    WINDOW *pcwin = newwin(3, 25, (height / 2) - 7, width - 29); 
+	WINDOW *atuwin = newwin(3, 30, (height / 2) - 4, width - 31);
+
     draw_pipeline_art(stdscr);
     refresh();
 
 
     do {
         fback(registradores, memD, pc, sinais, var, regS1, pilha, 0, countBeq);
+        
+        if(op == 1){
+			exibir_registradores(regwin, registradores);
+            exibir_regt(regtwin, regS1);
+            exibir_memoria(memwin, memD);
+            exibir_sinais(sinwin, sinais);
+            exibir_pc(pcwin, pc);
+            exibir_atual(atuwin, regmem, n_instrucoes, pc);
+
+
+            wrefresh(regwin);
+            wrefresh(regtwin);
+            wrefresh(memwin);
+            wrefresh(sinwin);
+            wrefresh(pcwin);
+            wrefresh(atuwin);
+		}
 
         if (*(pc) == (5 + n_instrucoes)) {
             mvwprintw(menuwin, 21, 2, "Todas as instruções foram executadas");
@@ -151,7 +169,8 @@ int main() {
 
     UC(sinais, regS1->bi_di);
 
-    BancoRegistradores(registradores, regS1->bi_di->inst->b11_9, regS1->bi_di->inst->b8_6, regS1->mem_er->muxRegDst, var->muxMemReg, var->saida1, var->saida2, regS1->mem_er->sinais->EscReg);
+    BancoRegistradores(registradores, regS1->bi_di->inst->b11_9, regS1->bi_di->inst->b8_6, 
+    regS1->mem_er->muxRegDst, var->muxMemReg, var->saida1, var->saida2, regS1->mem_er->sinais->EscReg);
 
     *regS2->di_ex->inst = *regS1->bi_di->inst;
     *regS2->di_ex->sinais = *sinais;
@@ -187,8 +206,8 @@ int main() {
     regS2->ex_mem->muxRegDst = var->muxRegDst;
     regS2->ex_mem->B = regS1->di_ex->B;
     regS2->ex_mem->flag = *var->flag;
+    
     //////////EX/MEM
-
     memDados(memD, regS1->ex_mem->saidaULA, regS1->ex_mem->B, regS1->ex_mem->sinais->EscMem, var->saidaMem);
 
     if ((regS1->ex_mem->flag + regS1->ex_mem->sinais->DVC) == 2) {
@@ -236,6 +255,23 @@ int main() {
     //////////
 
   } while (1);
+  
+   WINDOW *fimwin = newwin(20, 50, (height / 2) - 10, (width / 2) - 25);
+        box(fimwin, 0, 0);
+        keypad(fimwin, TRUE);
+        refresh();
+        wrefresh(fimwin);
+
+        mvwprintw(fimwin, 3, 15, "FIM");
+        mvwprintw(fimwin, 6, 20, "  ______");
+        mvwprintw(fimwin, 7, 20, " /     /|");
+        mvwprintw(fimwin, 8, 20, "/_____/ |");
+        mvwprintw(fimwin, 9, 20, "|_____| |");
+        mvwprintw(fimwin, 10, 20, "| (o) | |");
+        mvwprintw(fimwin, 11, 20, "|_____|/ ");
+        wrefresh(fimwin);
+        napms(4000);
+        
   endwin();
   return 0;
 }

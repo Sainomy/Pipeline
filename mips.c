@@ -632,11 +632,11 @@ void exibir_atual(WINDOW *atuwin, struct instrucao *mem, int n_instrucoes, int *
     wclear(atuwin);
     box(atuwin, 0, 0);
     char *assembly = traduzirAsm(mem, *PC);
-    mvwprintw(atuwin, 1, 1, "INSTRUCAO MIPS: \n    %s", assembly);
+    mvwprintw(atuwin, 0, 4, "INSTRUCAO ASSEMBLY:");
 
     //char *assembly = traduzirAsm(mem, *PC);
 
-    //mvwprintw(atuwin, 2, 2, "%s", assembly);
+    mvwprintw(atuwin, 1, 3, "%s", assembly);
 
     wrefresh(atuwin);
 	free(assembly);
@@ -666,7 +666,7 @@ int menu(struct controle *sinais, int *PC, struct regiS *regis, int *registrador
     mvwprintw(menuwin, 8, 14, "(e) (STEP) Executar uma linha");
     mvwprintw(menuwin, 10, 14, "(b) (BACK) Voltar uma instrução");
     mvwprintw(menuwin, 12, 14, "(m) Salvar .asm");
-    mvwprintw(menuwin, 14, 14, "(t) Salvar .dat e chorar");
+    mvwprintw(menuwin, 14, 14, "(t) Salvar .dat");
     mvwprintw(menuwin, 16, 14, "(x) Sair");
     wrefresh(menuwin);
     char op =  getch();
@@ -887,7 +887,7 @@ char *traduzirAsm(struct instrucao *mem, int pc){
 
 void salvarDat(int *memD){
   FILE *arquivo;
-  arquivo = fopen("dados.txt", "w");
+  arquivo = fopen("dados.dat", "w");
   if(arquivo == NULL){
     printf("Erro ao abrir o arquivo.\n");
     return;

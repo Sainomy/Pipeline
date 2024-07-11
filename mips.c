@@ -145,12 +145,12 @@ struct controle *UC(struct controle *sinais, struct regiBI_ID *bits){
     case 15:
       sinais->RegDst = 0;
       sinais->ULAOp = 0;
-      sinais->ULAFonte = 0;
+      sinais->ULAFonte = 1;
       sinais->DVC = 0;
       sinais->DVI = 0;
       sinais->EscMem = 1;
       sinais->EscReg = 0;
-      sinais->MemParaReg = 1;
+      sinais->MemParaReg = 0;
       break;
   }
   return sinais;
@@ -646,7 +646,7 @@ void exibir_pc(WINDOW *pcwin, int *PC){
 
     wclear(pcwin);
     box(pcwin, 0, 0);
-    mvwprintw(pcwin, 1, 8, "PC: %i", *PC);
+    mvwprintw(pcwin, 1, 8, "PC: %i", *PC+1);
 
     wrefresh(pcwin);
 }

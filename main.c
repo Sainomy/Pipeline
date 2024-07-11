@@ -198,7 +198,7 @@ int main() {
 	  var->muxDVC = 0;
 	}
     if (var->muxDVC == 1) {
-      regS1->ex_mem->DVC = regS1->ex_mem->pc + 1 + regS1->ex_mem->inst->b5_0;
+      regS1->ex_mem->DVC = regS1->ex_mem->pc + regS1->ex_mem->inst->b5_0;
     } 
     else {
       regS1->ex_mem->DVC = *pc + 1;
